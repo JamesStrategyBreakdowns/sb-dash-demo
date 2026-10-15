@@ -518,13 +518,13 @@ function relISO(n) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-const DAILY_PILOT_END = relISO(11);
+const DAILY_PILOT_END = relISO(-24);
 
 const HOME_TARGET = 15e4;
 
-const DAILY_PILOT = relISO(5);
+const DAILY_PILOT = relISO(-30);
 
-const DAILY_LAUNCH = relISO(19);
+const DAILY_LAUNCH = relISO(-14);
 
 function homeWeekLine(today) {
   const monday = bookAddDays(today, -((today.getDay() + 6) % 7));
