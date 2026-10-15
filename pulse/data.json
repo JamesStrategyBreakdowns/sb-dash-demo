@@ -1,0 +1,269 @@
+{
+ "campaigns": [
+  {
+   "name": "Globex",
+   "sponsor": "Phase 3",
+   "items": [
+    {
+     "t": "Ad 1",
+     "date": "Oct 4",
+     "s": "done",
+     "url": "https://demo.invalid/deliverable/globex-3"
+    },
+    {
+     "t": "LinkedIn",
+     "date": "Oct 5",
+     "s": "done",
+     "url": "https://demo.invalid/deliverable/globex-3"
+    },
+    {
+     "t": "X",
+     "date": "Oct 6",
+     "s": "done",
+     "url": "https://demo.invalid/deliverable/globex-3"
+    },
+    {
+     "t": "Ad 2",
+     "date": "Oct 11",
+     "s": "done",
+     "url": "https://demo.invalid/deliverable/globex-3"
+    },
+    {
+     "t": "Ad 3",
+     "date": "Oct 18",
+     "s": "active",
+     "url": "https://demo.invalid/deliverable/globex-3"
+    },
+    {
+     "t": "Ad 4",
+     "date": "Oct 25",
+     "s": "active",
+     "url": "https://demo.invalid/deliverable/globex-3"
+    },
+    {
+     "t": "Retarget",
+     "date": "Oct 28",
+     "s": "active",
+     "url": "https://demo.invalid/deliverable/globex-3"
+    },
+    {
+     "t": "Domain Ins.",
+     "date": "Nov 4",
+     "s": "active",
+     "url": "https://demo.invalid/deliverable/globex-3"
+    }
+   ]
+  },
+  {
+   "name": "Prestige Worldwide",
+   "sponsor": "Phase 3",
+   "items": [
+    {
+     "t": "Ad 1",
+     "date": "Oct 28",
+     "s": "active",
+     "url": "https://demo.invalid/deliverable/prestige-worldwide-3"
+    },
+    {
+     "t": "LinkedIn",
+     "date": "Oct 29",
+     "s": "active",
+     "url": "https://demo.invalid/deliverable/prestige-worldwide-3"
+    },
+    {
+     "t": "X",
+     "date": "Oct 30",
+     "s": "active",
+     "url": "https://demo.invalid/deliverable/prestige-worldwide-3"
+    },
+    {
+     "t": "Ad 2",
+     "date": "Nov 4",
+     "s": "active",
+     "url": "https://demo.invalid/deliverable/prestige-worldwide-3"
+    },
+    {
+     "t": "Ad 3",
+     "date": "Nov 11",
+     "s": "todo",
+     "url": "https://demo.invalid/deliverable/prestige-worldwide-3"
+    },
+    {
+     "t": "Retarget",
+     "date": "Nov 14",
+     "s": "todo",
+     "url": "https://demo.invalid/deliverable/prestige-worldwide-3"
+    },
+    {
+     "t": "Domain Ins.",
+     "date": "Nov 21",
+     "s": "todo",
+     "url": "https://demo.invalid/deliverable/prestige-worldwide-3"
+    }
+   ]
+  },
+  {
+   "name": "Sterling Cooper",
+   "sponsor": "Phase 3",
+   "items": [
+    {
+     "t": "Ad 1",
+     "date": "Sep 23",
+     "s": "done",
+     "url": "https://demo.invalid/deliverable/sterling-cooper-3"
+    },
+    {
+     "t": "LinkedIn",
+     "date": "Sep 24",
+     "s": "done",
+     "url": "https://demo.invalid/deliverable/sterling-cooper-3"
+    },
+    {
+     "t": "X",
+     "date": "Sep 25",
+     "s": "done",
+     "url": "https://demo.invalid/deliverable/sterling-cooper-3"
+    },
+    {
+     "t": "Ad 2",
+     "date": "Sep 30",
+     "s": "done",
+     "url": "https://demo.invalid/deliverable/sterling-cooper-3"
+    },
+    {
+     "t": "Ad 3",
+     "date": "Oct 7",
+     "s": "done",
+     "url": "https://demo.invalid/deliverable/sterling-cooper-3"
+    },
+    {
+     "t": "Retarget",
+     "date": "Oct 10",
+     "s": "done",
+     "url": "https://demo.invalid/deliverable/sterling-cooper-3"
+    },
+    {
+     "t": "Domain Ins.",
+     "date": "Oct 17",
+     "s": "active",
+     "url": "https://demo.invalid/deliverable/sterling-cooper-3"
+    }
+   ]
+  },
+  {
+   "name": "Tyrell Corp",
+   "sponsor": "Phase 3",
+   "items": [
+    {
+     "t": "Ad 1",
+     "date": "Oct 18",
+     "s": "active",
+     "url": "https://demo.invalid/deliverable/tyrell-corp-3"
+    },
+    {
+     "t": "LinkedIn",
+     "date": "Oct 19",
+     "s": "active",
+     "url": "https://demo.invalid/deliverable/tyrell-corp-3"
+    },
+    {
+     "t": "X",
+     "date": "Oct 20",
+     "s": "active",
+     "url": "https://demo.invalid/deliverable/tyrell-corp-3"
+    },
+    {
+     "t": "Ad 2",
+     "date": "Oct 25",
+     "s": "active",
+     "url": "https://demo.invalid/deliverable/tyrell-corp-3"
+    },
+    {
+     "t": "Breakdown",
+     "date": "Oct 25",
+     "s": "active",
+     "url": "https://demo.invalid/deliverable/tyrell-corp-3"
+    },
+    {
+     "t": "Ad 3",
+     "date": "Nov 1",
+     "s": "active",
+     "url": "https://demo.invalid/deliverable/tyrell-corp-3"
+    },
+    {
+     "t": "Ad 4",
+     "date": "Nov 8",
+     "s": "todo",
+     "url": "https://demo.invalid/deliverable/tyrell-corp-3"
+    },
+    {
+     "t": "Retarget",
+     "date": "Nov 11",
+     "s": "todo",
+     "url": "https://demo.invalid/deliverable/tyrell-corp-3"
+    },
+    {
+     "t": "Domain Ins.",
+     "date": "Nov 18",
+     "s": "todo",
+     "url": "https://demo.invalid/deliverable/tyrell-corp-3"
+    }
+   ]
+  },
+  {
+   "name": "Wonka Industries",
+   "sponsor": "Phase 3",
+   "items": [
+    {
+     "t": "Ad 1",
+     "date": "Nov 4",
+     "s": "active",
+     "url": "https://demo.invalid/deliverable/wonka-industries-3"
+    },
+    {
+     "t": "LinkedIn",
+     "date": "Nov 5",
+     "s": "active",
+     "url": "https://demo.invalid/deliverable/wonka-industries-3"
+    },
+    {
+     "t": "X",
+     "date": "Nov 6",
+     "s": "todo",
+     "url": "https://demo.invalid/deliverable/wonka-industries-3"
+    },
+    {
+     "t": "Ad 2",
+     "date": "Nov 11",
+     "s": "todo",
+     "url": "https://demo.invalid/deliverable/wonka-industries-3"
+    },
+    {
+     "t": "Ad 3",
+     "date": "Nov 18",
+     "s": "todo",
+     "url": "https://demo.invalid/deliverable/wonka-industries-3"
+    },
+    {
+     "t": "Ad 4",
+     "date": "Nov 25",
+     "s": "todo",
+     "url": "https://demo.invalid/deliverable/wonka-industries-3"
+    },
+    {
+     "t": "Retarget",
+     "date": "Nov 28",
+     "s": "todo",
+     "url": "https://demo.invalid/deliverable/wonka-industries-3"
+    },
+    {
+     "t": "Domain Ins.",
+     "date": "Dec 5",
+     "s": "todo",
+     "url": "https://demo.invalid/deliverable/wonka-industries-3"
+    }
+   ]
+  }
+ ],
+ "generatedAt": "2026-10-15T06:14:45.850Z"
+}

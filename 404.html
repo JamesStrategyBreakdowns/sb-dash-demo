@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>SB Dash (demo)</title>
+  <link rel="icon" type="image/png" href="data:,">
+  <script>
+    (function () {
+      var parts = location.pathname.split('/').filter(Boolean);
+      var sub = location.hostname.endsWith('github.io') || location.hostname === 'localhost';
+      var base = sub && parts.length ? '/' + parts[0] + '/' : '/';
+      location.replace(base);
+    })();
+  </script>
+</head>
+<body><p>Redirecting to the <a href="./">demo</a>…</p></body>
+</html>

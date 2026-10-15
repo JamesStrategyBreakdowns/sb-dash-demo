@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Campaign Pulse (demo)</title>
+<link rel="icon" type="image/png" href="../logo.png">
+<link rel="stylesheet" href="../mock/demo.css">
+<style>body{padding-top:62px !important}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FFFAF3; --ink:#232222; --muted:#98907f; --line:#efe6d6; --card:#ffffff;
+    --purple:#B19EF8; --purple-deep:#6d5bd0; --purple-soft:rgba(177,158,248,.18);
+    --orange:#FC6932; --yellow:#FFE7C6; --blue:#3843EB;
+    --todo-bd:#e7ddca; --todo-bg:#fffdf8; --todo-ink:#b8ad97;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cream);color:var(--ink);padding:34px 30px 60px;
+    font:15px/1.5 "Inter",-apple-system,BlinkMacSystemFont,sans-serif}
+  h1{font-family:"Poppins",sans-serif;font-weight:700;font-size:24px;margin:0 0 4px;
+    display:flex;align-items:center;gap:10px}
+  .sub{color:var(--muted);margin:0 0 24px;font-size:14px}
+  .badge{font:600 11px "Poppins";color:var(--orange);background:var(--yellow);
+    padding:3px 9px;border-radius:999px}
+  .legend{display:flex;gap:18px;margin:0 0 28px;font-size:12.5px;color:var(--muted);flex-wrap:wrap}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:11px;height:11px;border-radius:50%}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;
+    padding:20px 24px 10px;margin:0 0 20px;box-shadow:0 2px 10px rgba(80,50,10,.04)}
+  .chead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .cname{font-family:"Poppins";font-weight:600;font-size:18px}
+  .pill{font:600 12px "Inter";padding:3px 11px;border-radius:999px;
+    background:var(--purple-soft);color:var(--purple-deep)}
+  .count{margin-left:auto;font-size:13px;color:var(--muted)}
+  .count b{color:var(--ink);font-weight:600}
+  .nextup{font-size:12.5px;color:var(--muted);margin:14px 0 6px}
+  .nextup b{color:var(--orange)}
+  
+  .timeline{overflow-x:auto;padding:26px 22px 20px}
+  .tlinner{position:relative}                     
+  .barrow{position:relative;margin:0 0 18px}
+  .bar{height:8px;border-radius:999px;background:#f1ead9;overflow:hidden}
+  .bar>i{display:block;height:100%;border-radius:999px;
+    background:linear-gradient(90deg,var(--purple),var(--orange))}
+  .mascot{position:absolute;top:50%;transform:translate(-50%,-50%);z-index:3;  
+    width:38px;height:38px;border-radius:50%;background:#fff;border:2.5px solid var(--orange);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 3px 8px rgba(252,105,50,.28);animation:bob 1.8s ease-in-out infinite}
+  .mascot img{width:24px;height:24px;object-fit:contain;display:block}
+  .logo{height:30px;vertical-align:middle;margin-right:3px}
+  @keyframes bob{0%,100%{margin-top:-1px}50%{margin-top:-5px}}
+  
+  .track{display:flex}
+  .node{flex:0 0 116px;display:flex;flex-direction:column;align-items:center;position:relative}
+  .connector{position:absolute;top:27px;left:-50%;width:100%;height:2.5px;background:var(--todo-bd);z-index:0}
+  .node.done .connector{background:var(--purple)} .node.active .connector{background:var(--orange)}
+  .node:first-child .connector{display:none}
+  .box{position:relative;z-index:1;width:90px;min-height:54px;border-radius:13px;
+    display:flex;flex-direction:column;justify-content:center;align-items:center;gap:2px;
+    padding:8px 6px;text-align:center;border:1.5px solid var(--todo-bd);background:var(--todo-bg);
+    text-decoration:none;color:inherit;cursor:pointer;transition:transform .1s,box-shadow .1s}
+  .box:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(80,50,10,.12)}
+  .box .t{font:600 12.5px "Inter"} .box .d{font-size:10.5px;color:var(--muted)}
+  .node.done .box{border-color:var(--purple);background:var(--purple-soft)}
+  .node.active .box{border-color:var(--orange);background:var(--yellow);
+    box-shadow:0 0 0 4px rgba(252,105,50,.14)}
+  .tick{font-size:12px;margin-top:8px;color:var(--todo-ink)}
+  .node.done .tick{color:var(--purple-deep)} .node.active .tick{color:var(--orange);font-weight:700}
+</style>
+</head>
+<body>
+<div class="demo-banner" role="status">Demo mode - synthetic data, numbers blurred</div>
+  <h1><img class="logo" src="assets/mascot.png" alt=""> Campaign Pulse <span class="badge">demo</span></h1>
+  <p class="sub">Where each campaign is - and what's still owed. The mascot walks the bar to the point we've reached; the boxes ahead are what's left to deliver.</p>
+  <div class="legend">
+    <span><i class="dot" style="background:var(--purple)"></i> Delivered</span>
+    <span><i class="dot" style="background:var(--orange)"></i> In progress / next (the mascot is here)</span>
+    <span><i class="dot" style="background:var(--todo-bd)"></i> Still to deliver</span>
+  </div>
+  <div id="app"></div>
+
+<script>
+
+const ICON={done:"✓",active:"➜",todo:"○"};
+
+function render(campaigns){
+  document.getElementById("app").innerHTML = campaigns.map(c=>{
+    const done=c.items.filter(i=>i.s==="done").length, tot=c.items.length;
+    const pct=Math.round(done/tot*100);
+    const next=c.items.find(i=>i.s!=="done");
+    let mascotIdx=c.items.findIndex(i=>i.s==="active");
+    if(mascotIdx<0) mascotIdx=c.items.findIndex(i=>i.s==="todo");
+    const NODE_W=116;
+    const fillPx = mascotIdx>=0 ? (mascotIdx+0.5)*NODE_W : tot*NODE_W;
+    const nodes=c.items.map(i=>`
+      <div class="node ${i.s}">
+        <div class="connector"></div>
+        <a class="box" href="${i.url}" target="_blank" rel="noopener"><span class="t">${i.t}</span><span class="d">${i.date}</span></a>
+        <div class="tick">${ICON[i.s]}</div>
+      </div>`).join("");
+    const mascot = mascotIdx>=0
+      ? `<div class="mascot" style="left:${fillPx}px" title="We are here"><img src="assets/mascot.png" alt=""></div>` : "";
+    return `<div class="card">
+      <div class="chead">
+        <span class="cname">${c.name}</span>
+        <span class="pill">${c.sponsor}</span>
+        <span class="count"><b>${done}</b> of <b>${tot}</b> delivered · ${pct}%</span>
+      </div>
+      <div class="nextup">Next up: <b>${next?next.t+" - "+next.date:"🎉 all delivered"}</b></div>
+      <div class="timeline"><div class="tlinner" style="width:${tot*NODE_W}px">
+        <div class="barrow"><div class="bar"><i style="width:${fillPx}px"></i></div>${mascot}</div>
+        <div class="track">${nodes}</div>
+      </div></div>
+    </div>`;
+  }).join("");
+  document.querySelectorAll(".timeline").forEach(tr=>{
+    const a=tr.querySelector(".node.active")||tr.querySelector(".node.todo");
+    if(a) tr.scrollLeft=Math.max(0,a.offsetLeft-tr.clientWidth/2+a.offsetWidth/2);
+  });
+}
+
+async function load(){
+  try{
+    const r = await fetch("data.json", {cache:"no-store"});
+    if(!r.ok) throw new Error("live data unavailable");
+    const j = await r.json();
+    render(j.campaigns);
+  }catch(e){
+    document.getElementById("app").textContent = "Could not load the campaign data.";
+  }
+}
+
+load();
+
+document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) load(); });
+</script>
+<script src="../mock/spoiler.js"></script>
+</body>
+</html>

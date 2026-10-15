@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SB Dash (demo)</title>
+  <meta name="description" content="A demo of the Strategy Breakdowns team dashboard, running on synthetic data.">
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="theme-color" content="#1A1A1F">
+  <script>try{if(localStorage.getItem('sbLabTheme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="daily-deck.css">
+  <link rel="stylesheet" href="mock/demo.css">
+</head>
+<body>
+  <div class="demo-banner" role="status">Demo mode - synthetic data, numbers blurred</div>
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <img src="logo.png" alt="SB Dash" class="sidebar-logo">
+      <span class="sidebar-title">SB Dash</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-item" data-tab="home">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 7l6-4.5L14 7v6.5a.5.5 0 0 1-.5.5H10V10H6v4H2.5a.5.5 0 0 1-.5-.5V7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        Home
+      </button>
+
+      <div class="nav-section">Revenue</div>
+      <button class="nav-item" data-tab="pipeline">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 3h12M3 3v3l3 3v4l4 1V9l3-3V3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Sponsorship Pipeline
+      </button>
+      <div class="nav-section">Delivery</div>
+      <button class="nav-item" data-tab="contentcal">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M2 6h12M5 2v2M11 2v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="5.5" cy="9.3" r="1.1" fill="currentColor"/><circle cx="8" cy="9.3" r="1.1" fill="currentColor"/><circle cx="10.5" cy="9.3" r="1.1" fill="currentColor"/></svg>
+        Content Calendar
+      </button>
+      <button class="nav-item" data-tab="fulfilment">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 5l6-3 6 3-6 3-6-3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M2 5v6l6 3 6-3V5M8 8v6" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        Campaign Tracker
+      </button>
+      <div class="nav-section">Dailies</div>
+      <button class="nav-item" data-tab="dailies" title="What the daily run is feeding us, and the button that opens the swipe deck">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="4.5" y="2" width="9" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 4.5v7.5a2 2 0 0 0 2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Daily Triage
+        <span class="draft-count-badge" id="ddLaunchCount"></span>
+      </button>
+      <div class="nav-section">Audience</div>
+      <button class="nav-item" data-tab="audience">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.2" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 13c0-2 1.6-3.3 3.5-3.3S9.5 11 9.5 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10.5 4.2A2 2 0 0 1 11 8m1 4.8c0-1.4-.5-2.5-1.5-3.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Audience Growth
+      </button>
+      <div class="nav-section">Skills &amp; System</div>
+      <button class="nav-item" data-tab="skills">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Skills
+      </button>
+      <button class="nav-item" data-tab="skillpeople">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.2" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 13c0-2 1.6-3.3 3.5-3.3S9.5 11 9.5 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M11 5.5h3M11 8.5h3M12 11.5h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Skills by Person
+      </button>
+    </nav>
+
+    <div class="sidebar-resize" id="sidebarResize" title="Drag to resize"></div>
+    <div class="sidebar-footer">
+      <div class="theme-switch" id="themeSwitch" role="group" aria-label="Theme">
+        <button class="theme-switch-btn" id="themeBtnLight" aria-pressed="false" aria-label="Light mode" title="Light mode">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5v1.5M8 13v1.5M1.5 8H3M13 8h1.5M3.4 3.4l1.06 1.06M11.54 11.54l1.06 1.06M3.4 12.6l1.06-1.06M11.54 4.46l1.06-1.06" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <button class="theme-switch-btn" id="themeBtnDark" aria-pressed="true" aria-label="Dark mode" title="Dark mode">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13.5 9.6A5.5 5.5 0 0 1 6.4 2.5a5.5 5.5 0 1 0 7.1 7.1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <span class="connection-status" id="connectionStatus">connecting...</span>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <section class="tab-panel active" id="panel-home">
+      <div class="panel-header">
+        <h2>Home</h2>
+      </div>
+      <div class="home-grid" id="homeGrid"></div>
+    </section>
+    <section class="tab-panel" id="panel-pipeline">
+      <div class="panel-header">
+        <h2>Sponsorship Pipeline <span class="count" id="pipeCount"></span></h2>
+        <p class="section-hint" id="pipeSub">Loading&hellip;</p>
+      </div>
+      <div class="pipe-cards" id="pipeCards"></div>
+      <div id="gbPanel"></div>
+      <div class="pipe-charts" id="pipeCharts"></div>
+      <section class="mv-block" id="mvBlock">
+        <div class="pipe-board-head">
+          <h3 class="collapse-head" role="button" tabindex="0" aria-expanded="true" data-collapse="mvBlock"><span class="collapse-caret" aria-hidden="true"></span>Movement <span class="count" id="mvCount"></span></h3>
+          <p class="section-hint" id="mvSub"></p>
+        </div>
+        <div class="mv-list" id="mvList"></div>
+      </section>
+
+      <section class="ren-block" id="renBlock" hidden>
+        <div class="pipe-board-head">
+          <h3 class="collapse-head" role="button" tabindex="0" aria-expanded="true" data-collapse="renBlock"><span class="collapse-caret" aria-hidden="true"></span>Renewals to start <span class="count" id="renCount"></span></h3>
+          <p class="section-hint" id="renSub"></p>
+        </div>
+        <div class="ren-list" id="renList"></div>
+      </section>
+
+      <div class="pipe-board-head">
+        <h3>Deal board</h3>
+        <p class="section-hint">Every open deal, flowing left to right toward the win. Click a card to open it in the CRM (links are disabled in the demo).</p>
+      </div>
+      <div class="pipe-board" id="pipeBoard"></div>
+    </section>
+    <section class="tab-panel" id="panel-contentcal">
+      <div class="panel-header">
+        <h2>Content Calendar <span class="count" id="ccalCount"></span></h2>
+        <p class="section-hint" id="ccalSub">Loading&hellip;</p>
+      </div>
+      <div class="cc-legend" id="ccalLegend">
+        <span><i class="cc-dot green"></i>Sent, or every send-gate + progress item met</span>
+        <span><i class="cc-dot yellow"></i>Gate clear so far, still building</span>
+        <span><i class="cc-dot red"></i>A send-gate must-have is failing</span>
+        <span class="cc-legend-hint">Click a day to see every checkpoint. Scroll the grid to change months.</span>
+      </div>
+      <div class="cc-month-bar">
+        <div class="cc-month-nav">
+          <button class="cc-month-btn" id="ccalPrevBtn" title="Previous month">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <h3 class="cc-month-label" id="ccalMonthLabel"></h3>
+          <button class="cc-month-btn" id="ccalNextBtn" title="Next month">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <button class="cc-month-today" id="ccalTodayBtn">Today</button>
+      </div>
+      <div class="cc-month-dow" id="ccalDow"></div>
+      <div class="cc-grid" id="ccalGrid"></div>
+      <div class="idea-modal-overlay" id="ccalModalOverlay" onclick="closeCcalModal()"></div>
+      <div class="idea-modal cc-modal" id="ccalModal">
+        <div class="idea-modal-header">
+          <div class="win-dots"><i></i><i></i><i></i></div>
+          <div>
+            <h3 id="ccalModalTitle"></h3>
+            <p class="cc-modal-subtitle" id="ccalModalSubtitle"></p>
+          </div>
+          <button class="idea-modal-close" onclick="closeCcalModal()">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <div class="idea-modal-body" id="ccalModalBody"></div>
+      </div>
+    </section>
+    <section class="tab-panel" id="panel-fulfilment">
+      <div class="panel-header">
+        <h2>Campaign Tracker</h2>
+        <p class="section-hint">Where every live campaign is up to, and what is still owed. Deliverables run left to right toward delivery. In the real dashboard this is read live from the Notion Deliverables database.</p>
+      </div>
+      <div class="pulse-bar">
+        <span class="pulse-meta" id="pulseMeta">Loading&hellip;</span>
+        <button class="pulse-copy" id="pulseRefreshBtn" type="button">Refresh</button>
+      </div>
+      <div class="pulse-legend">
+        <span><i class="pulse-sw done"></i>Delivered</span>
+        <span><i class="pulse-sw active"></i>In progress / next</span>
+        <span><i class="pulse-sw todo"></i>Still to deliver</span>
+      </div>
+      <div id="pulseContainer"><div class="pipe-empty">Loading campaigns&hellip;</div></div>
+</section>
+    <section class="tab-panel" id="panel-dailies">
+      <div class="panel-header">
+        <h2>Daily Triage <span class="count" id="dtCount"></span></h2>
+        <p class="section-hint" id="dtSub">Loading&hellip;</p>
+      </div>
+      <div class="dt-hero">
+        <button type="button" class="dt-launch" id="dtLaunch">
+          <svg width="20" height="20" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="4.5" y="2" width="9" height="12" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M2.5 4.5v7.5a2 2 0 0 0 2 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          Open the triage deck
+          <span class="dt-launch-n" id="dtLaunchN"></span>
+        </button>
+        <div class="dt-hero-text">
+          <p class="dt-queue" id="dtQueue">Checking the queue&hellip;</p>
+          <p class="dt-keys">Drag right to migrate, left to archive, up for later <kbd>Z</kbd> undo <kbd>Esc</kbd> back here</p>
+        </div>
+      </div>
+      <div class="dt-toolbar">
+        <div class="dt-period" id="dtPeriod">
+          <button class="period-pill active" data-p="all">Lifetime</button>
+          <button class="period-pill" data-p="30">Last 30 days</button>
+        </div>
+        <button class="drafts-refresh-btn" id="dtRefresh" title="Re-read every Daily row"><span class="refresh-label">Refresh</span></button>
+      </div>
+      <div class="pipe-cards" id="dtKpis"></div>
+      <div class="dt-grid">
+        <div class="sub-block dt-intake" id="dtIntake"></div>
+        <div class="sub-block dt-sources" id="dtSources"></div>
+        <div class="sub-block dt-topics" id="dtTopics"></div>
+      </div>
+    </section>
+    <section class="tab-panel" id="panel-audience">
+      <div class="panel-header">
+        <h2>Audience Growth <span class="count" id="subCount"></span></h2>
+        <p class="section-hint" id="subSub">Loading&hellip;</p>
+      </div>
+      <div class="sub-cards" id="subCards"></div>
+      <div class="sub-block">
+        <div class="sub-switch" id="subSwitch"></div>
+        <p class="sub-note" id="subNote"></p>
+        <svg id="subChart" class="sub-chart" viewBox="0 0 1120 380" role="img"></svg>
+      </div>
+      <div class="sub-block">
+        <h3 class="sub-h">Recent sends</h3>
+        <p class="sub-note">Open &amp; click rate per edition - your engagement health.</p>
+        <table class="sub-tbl" id="subSends"><thead><tr>
+          <th>Sent</th><th>Edition</th><th>Recipients</th><th>Open rate</th><th>Click rate</th></tr></thead><tbody></tbody></table>
+      </div>
+    </section>
+    <section class="tab-panel" id="panel-skills">
+      <div class="panel-header">
+        <h2>Skills</h2>
+        <p class="section-hint">Every Claude Code skill the team runs, so you can see what Claude can already do before asking for something new.</p>
+      </div>
+      <div class="skills-toolbar">
+        <input type="text" class="skills-search" id="skillsSearch" placeholder="Search by task, e.g. move an ad to next week…">
+        <span class="skills-count" id="skillCount"></span>
+      </div>
+      <div id="skillsView"></div>
+    </section>
+    <section class="tab-panel" id="panel-skillpeople">
+      <div class="panel-header">
+        <h2>Skills by Person</h2>
+        <p class="section-hint" id="spSub">Who built each skill and who keeps working on it, from git history.</p>
+      </div>
+      <div id="spContainer"><p class="section-hint">Loading&hellip;</p></div>
+    </section>
+  </main>
+
+  <aside class="drawer" id="skillDrawer">
+    <div class="drawer-header">
+      <div class="drawer-title-row">
+        <h3 id="drawerTitle"></h3>
+        <div class="drawer-workflow-tags" id="drawerWorkflowTags"></div>
+      </div>
+      <button class="drawer-close" id="drawerClose">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+  </aside>
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+
+  <script src="mock/seed.js"></script>
+  <script src="mock/mock-api.js"></script>
+  <script src="mock/spoiler.js"></script>
+  <script src="app.js"></script>
+  <script src="daily-deck.js"></script>
+  <script src="daily-triage.js"></script>
+</body>
+</html>
