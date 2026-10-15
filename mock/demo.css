@@ -1,4 +1,4 @@
-:root { --demo-bar: 28px; }
+:root { --demo-bar: 0px; }
 .demo-banner {
   position: fixed; top: 0; left: 0; right: 0; height: var(--demo-bar); z-index: 1000;
   display: flex; align-items: center; justify-content: center; gap: 8px;
