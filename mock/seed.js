@@ -37,6 +37,7 @@
   ];
   const DOMAIN = Object.fromEntries(COMPANIES.map(c => [c.name, `${c.slug}.demo`]));
   const LINK = path => `https://demo.invalid/${path}`;
+  const clone = o => JSON.parse(JSON.stringify(o));
 
   const ARTICLES = [
     'How Acme turned anvils into a subscription', 'The quiet genius of Hooli\'s free tier',
@@ -250,15 +251,15 @@
         const n = editionDays[ed];
         if ((slotUse.get(n) || 0) < 2) { adDays.push(n); slotUse.set(n, (slotUse.get(n) || 0) + 1); ed += 2; } else ed++;
       }
-      adDays.forEach((n, i) => deliverables.push({ sponsor, phase, kind: 'ad', label: `Ad ${i + 1}`, offset: n, amount: money(2100, 2900) }));
-      if (r() < 0.45 && adDays[1] != null) deliverables.push({ sponsor, phase, kind: 'sb', label: 'SB', offset: adDays[1], amount: money(14500, 21500, 250) });
+      adDays.forEach((n, i) => deliverables.push({ sponsor, phase, kind: 'ad', label: `Ad ${i + 1}`, offset: n, amount: money(700, 5900) }));
+      if (r() < 0.45 && adDays[1] != null) deliverables.push({ sponsor, phase, kind: 'sb', label: 'SB', offset: adDays[1], amount: money(5500, 39000, 250) });
       if (adDays[0] != null) {
-        deliverables.push({ sponsor, phase, kind: 'li', label: 'LI 1', offset: adDays[0] + 1, amount: money(2800, 3900, 50) });
+        deliverables.push({ sponsor, phase, kind: 'li', label: 'LI 1', offset: adDays[0] + 1, amount: money(900, 7400, 50) });
         deliverables.push({ sponsor, phase, kind: 'x', label: 'X 1', offset: adDays[0] + 2, amount: 0 });
       }
       const last = adDays[adDays.length - 1];
       if (last != null) {
-        deliverables.push({ sponsor, phase, kind: 'retarget', label: 'Retargeting', offset: last + 3, amount: money(900, 1400) });
+        deliverables.push({ sponsor, phase, kind: 'retarget', label: 'Retargeting', offset: last + 3, amount: money(250, 3100) });
         deliverables.push({ sponsor, phase, kind: 'insights', label: 'Domain Insights', offset: last + 10, amount: 0 });
       }
       cursor += between(9, 13);
@@ -306,27 +307,27 @@
     // ---------------------------------------------------- pipeline (CRM)
     const lifecycles = ['New business', 'Renewal', 'Upsell'];
     const OPEN = [
-      ['Acme Corp - Q1 ad bundle', 'Warm Lead', 9250, 6, 'New business', 'Intro call booked with their growth lead, Dana Whitfield.'],
-      ['Globex - Sponsored Breakdown', 'Sent Proposal', 21750, 5, 'New business', 'Proposal sent, waiting on budget sign-off.'],
-      ['Hooli - Phase 4 (renewal)', 'Verbal / Contract', 16250, 4, 'Renewal', 'Verbal yes from Marcus Lindqvist. Contract out for signature.'],
-      ['Initech - Daily launch package', 'Talking', 28400, 19, 'New business', 'Second call done. They want the Daily founding slots.'],
-      ['Pied Piper - Phase 3 (renewal)', 'Sent Proposal', 13250, 9, 'Renewal', 'Sent 2 options, follow up Friday.'],
-      ['Vandelay Industries - Ads + LinkedIn', 'Talking', 8650, 44, 'New business', 'Gone quiet after the rate card. Nudge.'],
-      ['Wonka Industries - Sponsored Breakdown', 'Warm Lead', 19500, 12, 'New business', 'Inbound from their partnerships team.'],
+      ['Acme Corp - Q1 ad bundle', 'Warm Lead', 13400, 6, 'New business', 'Intro call booked with their growth lead, Dana Whitfield.'],
+      ['Globex - Sponsored Breakdown', 'Sent Proposal', 31200, 5, 'New business', 'Proposal sent, waiting on budget sign-off.'],
+      ['Hooli - Phase 4 (renewal)', 'Verbal / Contract', 9100, 4, 'Renewal', 'Verbal yes from Marcus Lindqvist. Contract out for signature.'],
+      ['Initech - Daily launch package', 'Talking', 17300, 19, 'New business', 'Second call done. They want the Daily founding slots.'],
+      ['Pied Piper - Phase 3 (renewal)', 'Sent Proposal', 22600, 9, 'Renewal', 'Sent 2 options, follow up Friday.'],
+      ['Vandelay Industries - Ads + LinkedIn', 'Talking', 4100, 44, 'New business', 'Gone quiet after the rate card. Nudge.'],
+      ['Wonka Industries - Sponsored Breakdown', 'Warm Lead', 11900, 12, 'New business', 'Inbound from their partnerships team.'],
       ['Massive Dynamic - Q2 bundle', 'Sent Proposal', 32400, 37, 'Upsell', 'Proposal out 5 weeks. Chase with a case study.'],
-      ['Tyrell Corp - Retargeting add-on', 'Talking', 4250, 8, 'Upsell', 'Interested in the retargeting sequence.'],
+      ['Tyrell Corp - Retargeting add-on', 'Talking', 7700, 8, 'Upsell', 'Interested in the retargeting sequence.'],
       ['Weyland-Yutani - Annual partnership', 'Warm Lead', 52500, 22, 'New business', 'Procurement wants a 12-month view.'],
-      ['Sterling Cooper - Phase 2 (renewal)', 'Verbal / Contract', 11750, 13, 'Renewal', 'Agreed on the call, waiting on the PO.'],
-      ['Bluth Company - Daily ads', 'Talking', 6400, 3, 'New business', 'Wants 5 Daily slots in the launch month.'],
-      ['Dunder Mifflin - Ads', 'Warm Lead', 7850, 31, 'New business', 'Met at a conference, send the media kit.'],
-      ['Virtucon - Sponsored Breakdown', 'Sent Proposal', 19750, 2, 'New business', 'Proposal sent yesterday.'],
-      ['Nakatomi Trading - Phase 2 (renewal)', 'Talking', 14200, 51, 'Renewal', 'Champion left. Find the new owner.'],
-      ['Prestige Worldwide - Launch week', 'Warm Lead', 5600, 15, 'New business', 'Wants the launch-week package.'],
-      ['Globex - Domain insights upsell', 'Talking', 2900, 26, 'Upsell', 'Sent the sample report.'],
-      ['Acme Corp - Daily founding slot', 'Sent Proposal', 24800, 11, 'Upsell', 'Founding rate offer, expires end of month.'],
-      ['Hooli - LinkedIn add-on', 'Warm Lead', 3650, 64, 'Upsell', ''],
-      ['Initech - Retargeting', 'Warm Lead', 4800, 90, 'Upsell', 'Parked until their next quarter.'],
-      ['Wonka Industries - Ads', 'Talking', 11200, 7, 'New business', 'Drafting the media plan with them.'],
+      ['Sterling Cooper - Phase 2 (renewal)', 'Verbal / Contract', 19800, 13, 'Renewal', 'Agreed on the call, waiting on the PO.'],
+      ['Bluth Company - Daily ads', 'Talking', 12100, 3, 'New business', 'Wants 5 Daily slots in the launch month.'],
+      ['Dunder Mifflin - Ads', 'Warm Lead', 3300, 31, 'New business', 'Met at a conference, send the media kit.'],
+      ['Virtucon - Sponsored Breakdown', 'Sent Proposal', 27400, 2, 'New business', 'Proposal sent yesterday.'],
+      ['Nakatomi Trading - Phase 2 (renewal)', 'Talking', 6800, 51, 'Renewal', 'Champion left. Find the new owner.'],
+      ['Prestige Worldwide - Launch week', 'Warm Lead', 9700, 15, 'New business', 'Wants the launch-week package.'],
+      ['Globex - Domain insights upsell', 'Talking', 1600, 26, 'Upsell', 'Sent the sample report.'],
+      ['Acme Corp - Daily founding slot', 'Sent Proposal', 15900, 11, 'Upsell', 'Founding rate offer, expires end of month.'],
+      ['Hooli - LinkedIn add-on', 'Warm Lead', 5200, 64, 'Upsell', ''],
+      ['Initech - Retargeting', 'Warm Lead', 2400, 90, 'Upsell', 'Parked until their next quarter.'],
+      ['Wonka Industries - Ads', 'Talking', 21500, 7, 'New business', 'Drafting the media plan with them.'],
       ['Pied Piper - Breakdown rerun', 'Warm Lead', 0, 18, 'Upsell', 'Unpriced, they asked about a rerun.'],
     ];
     const deals = OPEN.map(([name, stage, value, age, lifecycle, nextAction], i) => ({
@@ -337,9 +338,9 @@
       'Tyrell Corp - Phase 1', 'Sterling Cooper - Phase 1', 'Bluth Company - Ads', 'Dunder Mifflin - LinkedIn', 'Virtucon - Ads', 'Nakatomi Trading - Phase 1',
       'Initech - Ads', 'Weyland-Yutani - Pilot', 'Vandelay Industries - Ads', 'Prestige Worldwide - Ads', 'Acme Corp - Retargeting', 'Globex - Phase 2 (renewal)', 'Hooli - Breakdown'];
     const wonAges = [2, 5, 9, 16, 22, 29, 37, 48, 55, 63, 77, 91, 104, 128, 156, 190, 231, 280, 333];
-    wonNames.forEach((name, i) => WON.push({ name, stage: 'Won', value: money(5200, 34000, 50), closedOn: iso(-wonAges[i]), lifecycle: pick(lifecycles), deliverables: `${between(3, 6)} newsletter ads, ${between(1, 2)} LinkedIn posts, a retargeting sequence and a domain insights report.`, nextAction: null, url: LINK(`crm/won-${i + 1}`) }));
+    wonNames.forEach((name, i) => WON.push({ name, stage: 'Won', value: money(2600, 41000, 50), closedOn: iso(-wonAges[i]), lifecycle: pick(lifecycles), deliverables: `${between(3, 6)} newsletter ads, ${between(1, 2)} LinkedIn posts, a retargeting sequence and a domain insights report.`, nextAction: null, url: LINK(`crm/won-${i + 1}`) }));
     const LOST = [
-      { name: 'Oceanic Air - Breakdown', stage: 'Lost', value: 17250, closedOn: iso(-3), lifecycle: 'New business', deliverables: null, nextAction: 'Went with a podcast instead.', url: LINK('crm/lost-1') },
+      { name: 'Oceanic Air - Breakdown', stage: 'Lost', value: 26300, closedOn: iso(-3), lifecycle: 'New business', deliverables: null, nextAction: 'Went with a podcast instead.', url: LINK('crm/lost-1') },
       { name: 'Gekko & Co - Ads', stage: 'Bad Fit', value: 0, closedOn: iso(-5), lifecycle: 'New business', deliverables: null, nextAction: 'Outside our audience.', url: LINK('crm/lost-2') },
     ];
     const closed = [...WON, ...LOST];
@@ -379,7 +380,7 @@
       meta: { pulled: iso(0), endingDays: 21, recentlyEndedDays: 30, sponsorsTracked: 14, actionable: 2, suppressed: [{ sponsor: 'Prestige Worldwide', why: 'one-off launch campaign, no renewal planned' }], unmatchedHolds: [] },
       rows: [
         { sponsor: 'Dunder Mifflin', band: 'ended', end: iso(-6), last: iso(-6), remaining: 0, daysLeft: null, daysSince: 6, deal: null,
-          priorDeal: { name: 'Dunder Mifflin - LinkedIn', stage: 'Won', value: 8450, url: LINK('crm/won-10') }, hold: null },
+          priorDeal: { name: 'Dunder Mifflin - LinkedIn', stage: 'Won', value: 4950, url: LINK('crm/won-10') }, hold: null },
         { sponsor: 'Virtucon', band: 'ending', end: iso(12), last: iso(-2), remaining: 2, daysLeft: 12, daysSince: null,
           deal: { name: 'Virtucon - Sponsored Breakdown', stage: 'Warm Lead', value: 0, url: LINK('crm/deal-14'), lifecycle: 'Renewal' }, priorDeal: null, hold: null },
         { sponsor: 'Weyland-Yutani', band: 'ending', end: iso(16), last: iso(-1), remaining: 1, daysLeft: 16, daysSince: null, deal: null, priorDeal: null,
@@ -505,40 +506,9 @@
     }
     const skillPeople = { meta: { generated: iso(0), note: 'Synthetic edit history for the demo.' }, skills: sp };
 
-    // ---------------------------------------------------- dailies
-    const ANGLES = [
-      { name: 'The direct read', key: 'stat' }, { name: 'The mechanism', key: 'why' }, { name: 'The so-what', key: 'sowhat' },
-    ];
-    const RH_TITLES = s => [
-      `${s.company}'s own write-up, annotated`, 'A primer on unit economics', 'How flywheels compound',
-      'The case against vanity metrics', 'Cohort charts, explained', 'What the chart leaves out',
-    ];
-    function versionsFor(s) {
-      const three = f => [0, 1, 2].map(f);
-      return {
-        schema: 1,
-        angles: ANGLES.map(a => ({ name: a.name, hook: s[a.key] })),
-        slug: s.titles[0].toLowerCase().replace(/[^a-z0-9]+/g, '-').split('-').filter(Boolean).slice(0, 3).join('-'),
-        title: s.titles.slice(),
-        subjects: three(v => [s.titles[v], `${s.stat.split(' ').slice(0, 7).join(' ')}...`, s.question, `The ${s.company} chart worth 60 seconds`]),
-        preview: three(v => [`${s.stat}. One chart, one minute.`, `Why it worked, in one chart.`, `What to steal from ${s.company}.`][v]),
-        caption: three(v => `${s[ANGLES[v].key].replace(/\.$/, '')}. ${s.context}`),
-        poll: three(v => `${[s.question, `Quick one: ${s.question.charAt(0).toLowerCase()}${s.question.slice(1)}`, s.question][v]}\n${s.options.map(o => `- ${o}`).join('\n')}`),
-        rabbitHole: three(() => ''),
-        rhSource: three(v => `- Data source: [${s.sourceName}](${LINK(`source/${s.id}`)}) - the full dataset${['', ', annotated', ', with the method notes'][v]} (fictional)`),
-        rhLinks: RH_TITLES(s).map((t, i) => ({
-          url: LINK(`read/${s.id}-${i + 1}`),
-          text: three(v => `- [${t}](${LINK(`read/${s.id}-${i + 1}`)}) - ${['why it matters', 'the mechanism behind it', 'what to do with it'][v]}.`),
-        })),
-        liPost: three(v => `${s[ANGLES[v].key].replace(/\.$/, '')}.\n\n${s.context}\n\n${v === 2 ? s.why : s.sowhat}\n\nFull chart in today's Daily.`),
-        xPost: three(v => `${s.titles[v]}\n\n${s.stat}.`),
-        liComments: three(v => [0, 1, 2].map(i => ({ text: [`The full breakdown is in today's Daily: [newsletter link at migration]`, `Source and method: ${s.sourceName} (fictional data).`, `What would you have done differently?`][i], image: null, withImage: false }))),
-        xComments: three(v => [`Full Daily: [newsletter link at migration]`, `Data: ${s.sourceName} (fictional).`, `Would you copy this playbook?`]),
-        picks: { title: 0, preview: 0, caption: 0, poll: 0, rabbitHole: 0, liPost: 0, xPost: 0, subjects: [[0, 0], [0, 1], [0, 2], [0, 3]], xComments: [[0, 0]], liComments: [[0, 0]], rhSource: 0, rhLinks: [[0, 0], [1, 0], [2, 0]] },
-      };
-    }
-    const dailySpecs = DAILIES.map(s => ({ ...s, versions: versionsFor(s), image: `graphics/${s.id}-v0.png` }));
-
+    // ---------------------------------------------------- daily research summary
+    // The research run files topics; people approve some for drafting, and approved
+    // drafts are migrated to beehiiv. There is no drafting deck in the demo.
     const KINDS = [
       { kind: 'x', label: '@contoso_charts' }, { kind: 'x', label: '@woodgrove_data' }, { kind: 'linkedin', label: 'Fabrikam Research' },
       { kind: 'reddit', label: 'r/northwind_charts' }, { kind: 'youtube', label: '@TailspinExplains' }, { kind: 'newsletter', label: 'Litware Weekly' },
@@ -547,62 +517,205 @@
     const CHARTS = ['Bar', 'Line', 'Donut', 'Area', 'Stacked bar', 'Scatter'];
     const PHRASES = ['revenue per employee', 'churn by cohort', 'pricing tiers', 'ad spend mix', 'R&D intensity', 'margin by line', 'growth by region',
       'payback period', 'net retention', 'CAC by channel', 'inventory turns', 'gross margin trend', 'subscriber growth', 'take rate', 'customer mix'];
+    const MIGRATED = ['🙌 In Beehiiv', '✅ Published'];
     const summaryRows = [];
     for (let i = 0; i < 150; i++) {
       const ago = Math.floor(Math.pow(r(), 1.3) * 70);
       const company = r() < 0.12 ? 'Multiple' : pick(sponsorNames);
-      const age = ago;
       const roll = r();
-      const outcome = age < 3 ? (roll < 0.7 ? 'open' : 'archived') : roll < 0.38 ? 'approved' : roll < 0.86 ? 'archived' : 'open';
-      const status = outcome === 'approved' ? (age > 6 ? '✅ Published' : '🙌 In Beehiiv') : outcome === 'archived' ? '📁 Archived' : pick(['1️⃣ Pending Review', 'Idea']);
+      const outcome = ago < 3 ? (roll < 0.7 ? 'open' : 'archived') : roll < 0.38 ? 'approved' : roll < 0.86 ? 'archived' : 'open';
+      const parked = r() < 0.2;
+      const status = outcome === 'approved' ? (ago <= 3 ? '✍️ Drafting' : parked ? '⏸️ Parked' : ago > 10 ? '✅ Published' : '🙌 In Beehiiv') : outcome === 'archived' ? '📁 Archived' : pick(['1️⃣ Pending Review', 'Idea']);
       summaryRows.push({
         id: `sum-${i}`, url: LINK(`ideas/sum-${i}`), created: stamp(-ago, between(6, 20)),
-        name: `${company === 'Multiple' ? 'Big Tech' : company}: ${pick(PHRASES)}`, status, published: status === '✅ Published',
+        name: `${company === 'Multiple' ? 'Big Tech' : company}: ${pick(PHRASES)}`, status, published: MIGRATED.includes(status),
         outcome, company, chartType: r() < 0.9 ? pick(CHARTS) : null, sponsored: r() < 0.06, source: r() < 0.88 ? pick(KINDS) : null,
       });
     }
-
-    const cards = dailySpecs.map((s, i) => ({
-      id: s.id, url: LINK(`ideas/${s.id}`), lastEdited: stamp(-Math.min(s.ago, 1), 9), created: stamp(-s.ago, 8 + i),
-      name: s.versions.title[0], subject: s.versions.subjects[0][0], hasSubjectProp: true, status: s.status, company: s.company, angle: s.versions.angles[0].name,
-      sponsored: false, migrate: !!s.slotted, socialsReady: s.socials, firstEdit: s.firstEdit, image: s.image,
-      versions: s.versions, versionsError: null, sections: {}, enriched: true, slotted: s.slotted || 0,
-    }));
-    for (const c of cards) {
-      summaryRows.push({ id: `sum-${c.id}`, url: c.url, created: c.created, name: c.name, status: c.status, published: false,
-        outcome: c.status === '🙌 In Beehiiv' ? 'approved' : 'open', company: c.company, chartType: { line: 'Line', bar: 'Bar', donut: 'Donut' }[DAILIES.find(d => d.id === c.id).chart.kind], sponsored: false, source: KINDS[c.id.length % KINDS.length] });
-    }
+    DAILIES.forEach((s, i) => {
+      summaryRows.push({
+        id: `sum-${s.id}`, url: LINK(`ideas/${s.id}`), created: stamp(-s.ago, 8 + i), name: s.stat, status: s.status,
+        published: MIGRATED.includes(s.status), outcome: MIGRATED.includes(s.status) ? 'approved' : 'open', company: s.company,
+        chartType: { line: 'Line', bar: 'Bar', donut: 'Donut' }[s.chart.kind], sponsored: false, source: KINDS[s.id.length % KINDS.length],
+      });
+    });
     summaryRows.sort((a, b) => b.created.localeCompare(a.created));
 
-    // Daily send days: the next 3 weeks of weekdays, with booked Daily ads.
-    const issues = [];
-    let adN = 0;
-    for (let n = 1; n <= 24; n++) {
-      const dow = dayAt(n).getDay();
-      if (dow === 0 || dow === 6) continue;
-      const nAds = n % 5 === 0 ? 0 : n % 3 === 0 ? 1 : 2;
-      const ads = [];
-      for (let j = 0; j < nAds; j++) {
-        const sp2 = sponsorNames[(n * 5 + j * 3) % sponsorNames.length];
-        adN++;
-        ads.push({ id: `dad-${adN}`, name: `${sp2} - Daily ad ${1 + (adN % 4)}`, type: 'Newsletter Ad', status: n < 6 ? 'Finalized and Scheduled' : 'In Review', hasCopy: n < 9 || j === 0, offered: n > 15 && j === 1 });
+    // ---------------------------------------------------- Big 3
+    const monday = n => { const d = dayAt(n); return -((d.getDay() + 6) % 7) + n; };
+    const B3 = {
+      Founder: [['Write the Pied Piper breakdown', 'In Progress', 'Ship 2 breakdowns a month', 'High', 'Medium', 8, 2],
+        ['Record 3 short video explainers', 'Next Up', 'Grow LinkedIn', 'Medium', 'Medium', 6, 5],
+        ['Sign off the Daily sponsor package', 'Blocked', 'Launch the Daily', 'High', 'Low', 9, 1]],
+      Ops: [['Automate the 14-day performance report', 'In Progress', 'Zero manual reporting', 'High', 'Medium', 8, 3],
+        ['Move the send-gate checks to a daily run', 'Next Up', 'Zero manual reporting', 'Medium', 'Low', 7, 6],
+        ['Tidy the sponsor portal template', 'In Progress', 'Better sponsor experience', 'Medium', 'Low', 6, 4]],
+      Partnerships: [['Close 3 Daily launch sponsors', 'In Progress', 'Fill Q1 inventory', 'High', 'High', 8, 9],
+        ['Chase every proposal older than 30 days', 'Next Up', 'Fill Q1 inventory', 'High', 'Low', 9, 2],
+        ['Draft the renewal playbook', 'In Progress', 'Lift renewals', 'Medium', 'Medium', 6, 7]],
+      Content: [['Trial 2 new chart sources for the research run', 'In Progress', 'Launch the Daily', 'Medium', 'Low', 7, 3],
+        ['Pick the 3 best breakdowns of the year to rerun', 'Next Up', 'Grow the list', 'High', 'Low', 8, 5],
+        ['Write the referral program emails', 'Blocked', 'Grow the list', 'Medium', 'Medium', 5, 8]],
+    };
+    const B3_LAST = {
+      Founder: [['Outline the Pied Piper breakdown', 'done'], ['Review the Q4 sponsor list', 'done'], ['Record a video explainer', 'carried']],
+      Ops: [['Fix the stale campaign tracker', 'done'], ['Write the send-gate checklist', 'done'], ['Clean up old automations', 'dropped']],
+      Partnerships: [['Send 5 renewal proposals', 'done'], ['Book 3 discovery calls', 'done'], ['Close the Daily launch sponsors', 'carried']],
+      Content: [['Rerun last spring\'s best piece', 'done'], ['Draft the referral emails', 'carried'], ['Audit the chart sources', 'done']],
+    };
+    const B3_BULLETS = [
+      ['Drafted 2 of 4 sections', 'Charts briefed to design'], ['Script for the first one written'], ['Waiting on the final price sheet'],
+      ['Report template agreed', 'Pull from beehiiv working for 7-day stats'], [], ['Header and timeline sections done'],
+      ['2 verbal yeses, 1 contract out'], ['6 chased, 2 replied'], ['First draft shared for comments'],
+      ['1 source added, 1 rejected'], ['Shortlist of 6 made'], ['Blocked on the reward design'],
+    ];
+    const big3Activity = {};
+    let b3i = 0;
+    const big3 = {
+      live: true, pulled: new Date(nowMs - 2 * 3600e3).toISOString(),
+      people: ROLES.map(name => ({
+        name,
+        items: B3[name].map(([task, status, goal, impact, effort, score, due]) => {
+          const id = `b3-${++b3i}`;
+          big3Activity[id] = B3_BULLETS[b3i - 1];
+          return { id, task, status, goal, impact, effort, score, due: iso(due), url: LINK(`tasks/${id}`), notes: '' };
+        }),
+      })),
+      lastWeek: {
+        week: iso(monday(-7)),
+        people: Object.fromEntries(ROLES.map(name => [name, B3_LAST[name].map(([task, outcome], i) => ({ task, outcome, url: LINK(`tasks/last-${name.toLowerCase()}-${i}`) }))])),
+      },
+    };
+    const weeklyActivity = { summary: { tasks: big3Activity } };
+
+    // ---------------------------------------------------- StrategyHub funnel
+    const PERIODS = [['last_7_days', 'Last 7 days', 0.24], ['last_30_days', 'Last 30 days', 1], ['last_90_days', 'Last 90 days', 2.7], ['all_time', 'All time', 9.5]];
+    const FEED = [['Free guide: 10 pricing plays', 'Sends the guide, then a short series on pricing.'], ['Strategy quiz', 'Quiz takers get their result and a 3-email follow-up.'],
+      ['Webinar sign-ups', 'Reminder sequence, then the replay.'], ['Template pack download', 'Delivers the templates, then hands over to the welcome offer.']];
+    const UNIFIED = [['Welcome offer, 5 emails', 'The core sequence everyone graduates into.'], ['Welcome offer, annual upgrade', 'For members on monthly, offers the annual plan.']];
+    const aut = (name, desc, kind, i) => {
+      const enrolled = kind === 'feed' ? between(1800, 5200) : between(1500, 3300);
+      const completed = Math.round(enrolled * (0.42 + r() * 0.3));
+      const exited = Math.round((enrolled - completed) * (0.3 + r() * 0.3));
+      return { id: `${kind}-${i + 1}`, name: `[${kind.toUpperCase()}] ${name}`, description: desc, enrolled, completed, exited, in_progress: enrolled - completed - exited,
+        period: { enrolled: 0 }, beehiiv_url: LINK(`beehiiv/automations/${kind}-${i + 1}`) };
+    };
+    const FEED_AUTS = FEED.map(([nm, ds], i) => aut(nm, ds, 'feed', i));
+    const UNI_AUTS = UNIFIED.map(([nm, ds], i) => aut(nm, ds, 'unified', i));
+    const PAGE_BASE = ['/', '/pricing', '/join', '/guide', '/quiz', '/webinar', '/templates'].map(path => [path, between(120, 2400), between(800, 6400)]);
+    const FUNNEL_BASE = { purchases: between(40, 90), revenue: between(9000, 21000), refund: 0.02 + r() * 0.03, upsell: 0.12 + r() * 0.1 };
+    const funnelFor = periodId => {
+      const [, label, k] = PERIODS.find(p => p[0] === periodId) || PERIODS[1];
+      const feedAuts = clone(FEED_AUTS), uniAuts = clone(UNI_AUTS);
+      feedAuts.forEach(a => { a.period.enrolled = Math.round(a.enrolled / 9.5 * k); });
+      uniAuts.forEach(a => { a.period.enrolled = Math.round(a.enrolled / 9.5 * k); });
+      const sum = (list, f) => list.reduce((s, a) => s + f(a), 0);
+      const pages = (host, f) => PAGE_BASE.map(([path, v, rev]) => {
+        const visitors = Math.round(v * f * k);
+        return { path, url: LINK(`${host}${path}`), visitors, revenue: ['/pricing', '/join'].includes(path) ? Math.round(rev * f * k) : 0 };
+      }).sort((a, b) => b.visitors - a.visitors);
+      const by_host = {};
+      for (const [host, f] of [['hub.sbdash.demo', 1], ['go.sbdash.demo', 0.45]]) {
+        const pg = pages(host, f);
+        by_host[host] = { visitors: sum(pg, p => p.visitors), revenue: sum(pg, p => p.revenue), pages: pg };
       }
-      issues.push({ id: `issue-${n}`, date: iso(n), daysOut: n, name: `Daily - ${short(n)}`, ads, houseAds: [], freeSlots: Math.max(0, 2 - ads.length), daily: null, extraDailies: [] });
-    }
-    const slottedCards = cards.filter(c => c.slotted);
-    slottedCards.forEach(c => {
-      const issue = issues[c.slotted - 1];
-      issue.daily = { id: c.id, name: c.name, status: c.status, migrate: true, publishedUrl: LINK(`beehiiv/drafts/${c.id}`), superseded: null, image: c.image, url: c.url };
-      issue.houseAds = ['Refer a friend', 'Sponsor this newsletter'].slice(0, issue.freeSlots);
+      const landingVisitors = Object.values(by_host).reduce((s, h) => s + h.visitors, 0);
+      const landingRevenue = Object.values(by_host).reduce((s, h) => s + h.revenue, 0);
+      const purchases = Math.round(FUNNEL_BASE.purchases * k);
+      const offers = [['Membership, annual', 0.42], ['Membership, monthly', 0.33], ['Template pack', 0.15], ['Workshop replay', 0.1]];
+      const revenue = Math.round(FUNNEL_BASE.revenue * k);
+      return {
+        generated_at: new Date(nowMs - 40 * 60e3).toISOString(), cached: false, period: periodId, period_label: label,
+        available_periods: PERIODS.map(([id, l]) => ({ id, label: l })), errors: [],
+        overview: { visitors: Math.round(landingVisitors * 2.6), sessions: Math.round(landingVisitors * 3.4), conversion_rate: purchases / landingVisitors },
+        landing: { total_visitors: landingVisitors, total_revenue: landingRevenue, by_host },
+        feed: { count: feedAuts.length, totals: { enrolled: sum(feedAuts, a => a.enrolled) }, period_totals: { enrolled: sum(feedAuts, a => a.period.enrolled) }, automations: feedAuts },
+        unified: { count: uniAuts.length, totals: { enrolled: sum(uniAuts, a => a.enrolled), completed: sum(uniAuts, a => a.completed) },
+          period_totals: { enrolled: sum(uniAuts, a => a.period.enrolled), completed: Math.round(sum(uniAuts, a => a.completed) / 9.5 * k) }, automations: uniAuts },
+        purchases: { completions: purchases },
+        purchases_all_time: { completions: Math.round(purchases / k * 9.5), revenue: Math.round(revenue / k * 9.5),
+          by_goal: [{ goal: 'Membership purchase', completions: Math.round(purchases * 0.75), visitors: Math.round(landingVisitors * 0.3) },
+            { goal: 'Template pack purchase', completions: Math.round(purchases * 0.25), visitors: Math.round(landingVisitors * 0.12) }] },
+        stripe: {
+          configured: true,
+          period: { revenue, refunded_revenue: Math.round(revenue * 0.03), purchase_count: purchases, refund_rate: FUNNEL_BASE.refund, upsell_rate: FUNNEL_BASE.upsell,
+            customers: Math.round(purchases * 0.92), top_offers: offers.map(([name, share]) => ({ name, purchases: Math.max(1, Math.round(purchases * share)), revenue: Math.round(revenue * share) })) },
+          lifetime: { revenue: Math.round(revenue / k * 9.5), purchase_count: Math.round(purchases / k * 9.5), customers: Math.round(purchases / k * 8.7), upsell_rate: 0.17 },
+          counts: { page_capped: false },
+        },
+      };
+    };
+    const funnelEmails = id => {
+      const n = id.startsWith('unified') ? 5 : 3;
+      const SUBJ = ['Here it is, as promised', 'The 1 pricing mistake we see most', 'What the best teams do differently', 'Your invite (closes Friday)', 'Last call on the founding price'];
+      return { emails: Array.from({ length: n }, (_, i) => ({ subject_line: SUBJ[(i + id.length) % SUBJ.length], first_sent_at: Math.floor(dayAt(-300 + i).getTime() / 1000),
+        last_sent_at: Math.floor(dayAt(-1).getTime() / 1000), status: 'active' })) };
+    };
+
+    // ---------------------------------------------------- shipping leaderboard
+    const PEOPLE = [['Ops', false, 1180], ['Founder', false, 640], ['Content', false, 410], ['Partnerships', false, 230], ['Claude (cloud)', true, 1460], ['automation-bot', true, 520]];
+    const contributors = PEOPLE.map(([name, isBot, commits]) => {
+      const c30 = Math.round(commits * (0.1 + r() * 0.12));
+      return { name, isBot, commits, commits30d: c30, commits90d: Math.round(c30 * (2.4 + r() * 0.6)), activeDays: isBot ? between(140, 300) : between(60, 190),
+        added: commits * between(60, 140), removed: commits * between(20, 70), files: between(80, 600), first: iso(-between(300, 364)), last: iso(-between(0, 3)) };
+    }).sort((a, b) => b.commits - a.commits);
+    const shipping = { meta: { generated: iso(0), windowDays: 365, totalCommits: contributors.reduce((s, c) => s + c.commits, 0), routineCommitsExcluded: 0, note: 'Synthetic history for the demo.' },
+      contributors, byMonth: {} };
+
+    // ---------------------------------------------------- automation watchdog
+    const WD = [
+      ['Acme Corp', 'Performance report', 'Partnerships', 'drafted', '7-day report due tomorrow', 'Checked the stats pull ran and drafted the sponsor update.', 'None, ready for a human to send.'],
+      ['Hooli', 'Ad preview', 'Ops', 'nudged', 'Preview not posted for Wednesday\'s ad', 'The preview job ran but found no scheduled draft.', 'Nudged Ops: the draft is not scheduled yet.'],
+      ['Globex', 'Retargeting sequence', 'Partnerships', 'blocked', 'Segment not built', 'The segment job skipped: no clicks recorded yet.', 'Clicks land 24h after send, re-check tomorrow.'],
+      ['Initech', 'Domain insights', 'Ops', 'drafted', 'Monthly report due Friday', 'Pulled the click domains and drafted the report.', 'None.'],
+      ['Pied Piper', 'Close-out', 'Ops', 'skipped_not_ours', 'Edition close-out', 'Belongs to the editorial checklist, not a sponsor task.', 'Skipped.'],
+      ['Wonka Industries', 'Ad copy approval', 'Partnerships', 'unmatched', 'Approval request with no matching deliverable', 'Could not match the request to a booked ad.', 'Flagged for a human to link it.'],
+      ['Tyrell Corp', 'Performance report', 'Partnerships', 'drafted', '14-day report due today', 'Pulled the final numbers and drafted the update.', 'None.'],
+    ];
+    const wdTask = ([sponsor, task_type, owner, status, outstanding, what_i_did, issues_next_steps], i) => ({
+      sponsor, task_type, owner, status, outstanding, what_i_did, issues_next_steps, source_task_url: LINK(`tasks/wd-${i}`), sandbox_permalink: null });
+    const watchdog = {
+      last_run_at: stamp(0, 7),
+      runs: [
+        { started_at: stamp(-2, 7), tasks: [WD[1], WD[3], WD[4]].map(wdTask) },
+        { started_at: stamp(-1, 7), tasks: [WD[0], WD[2], WD[6], WD[5]].map(wdTask) },
+        { started_at: stamp(0, 7), tasks: WD.map(wdTask) },
+      ],
+    };
+
+    // ---------------------------------------------------- repo tree and suggestions (both hidden in the demo)
+    const FILES = ['context/brand/voice.md', 'context/brand/colours.md', 'context/brand/logo-rules.md', 'context/sales/playbook.md', 'context/sales/objections.md',
+      'context/sales/case-studies.md', 'context/content/style-guide.md', 'context/content/checklist.md', 'context/content/chart-rules.md', 'context/ops/handbook.md',
+      'context/ops/calendar-rules.md', 'context/ops/onboarding.md', 'context/reports/template.md', 'context/reports/glossary.md', 'context/notes/ideas.md'];
+    const context = FILES.map((path, i) => {
+      const days = [1, 3, 9, 14, 21, 33, 2, 45, 6, 61, 12, 4, 27, 90, 5][i];
+      return { path, lastModified: stamp(-days, 11), daysSinceUpdate: days, staleness: days > 30 ? 'stale' : days > 7 ? 'aging' : 'fresh', size: between(1200, 24000) };
     });
-    const dailyCalendar = { issues, leadDays: 3, houseAds: ['Refer a friend', 'Sponsor this newsletter'], slots: 2, build: { lastDispatch: null, lastError: null, pending: false }, deletedDrafts: [] };
+    const suggestions = { content: [
+      '# Skill suggestions', '',
+      '## /weekly-recap', '**Pattern:** The same Friday summary is written by hand each week.', '**Evidence:** Seen in 4 sessions.', '**Proposed skill:** Draft the recap from the week\'s activity.', '',
+      '## /sponsor-faq', '**Pattern:** Sponsors ask the same 5 questions before booking.', '**Evidence:** Seen in 6 sessions.', '**Proposed skill:** Answer from the FAQ and link the media kit.', '',
+      '## /chart-check', '**Pattern:** Charts get checked against their source by hand.', '**Evidence:** Seen in 3 sessions.', '**Proposed skill:** Re-read the source and flag any number that does not match.', '',
+    ].join('\n') };
+
+    // ---------------------------------------------------- social performance (hidden in the demo)
+    const POSTS = [['A pricing page teardown', 'Carousel'], ['Why free tiers work', 'Text'], ['The 3-sided marketplace, drawn', 'Image'], ['Retention curves, read properly', 'Carousel'],
+      ['What a moat is not', 'Text'], ['One chart on ad spend', 'Image'], ['The referral loop, explained', 'Video']];
+    const social = { generatedAt: new Date(nowMs).toISOString(), posts: POSTS.map(([name, format], i) => {
+      const d = dayAt(-1 - i);
+      return { name, date: iso(-1 - i), dateLabel: `${DOW[d.getDay()].slice(0, 3)} ${short(-1 - i)}`, format, type: 'Organic',
+        li: { impressions: between(4000, 38000), likes: between(40, 420), comments: between(5, 60), reposts: between(2, 30), saves: between(4, 80), followers: between(5, 140),
+          clicks: between(10, 160), linkPlacement: i % 2 ? 'In comment' : 'In post', url: LINK(`li/post-${i}`) },
+        x: { impressions: between(1500, 14000), likes: between(10, 160), comments: between(1, 25), reposts: between(1, 30), saves: between(1, 40), url: LINK(`x/post-${i}`) } };
+    }) };
 
     const sponsors = {
       domains: Object.fromEntries(COMPANIES.map(c => [c.name, DOMAIN[c.name]])),
       files: Object.fromEntries(COMPANIES.map(c => [DOMAIN[c.name], `logos/${c.slug}.svg`])),
     };
 
-    return { sponsors, pipeline, closed, movement, renewals, bookings, calendar, pulse, subscribers, followers, contentCalendar, skills, workflows, skillPeople, cards, dailySummary: summaryRows, dailyCalendar };
+    return { sponsors, pipeline, closed, movement, renewals, bookings, calendar, pulse, subscribers, followers, contentCalendar, skills, workflows, skillPeople,
+      dailySummary: summaryRows, big3, weeklyActivity, funnelFor, funnelEmails, shipping, watchdog, context, suggestions, social };
   }
 
   return { build, COMPANIES, DAILIES, prng };

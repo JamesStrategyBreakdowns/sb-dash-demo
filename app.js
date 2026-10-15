@@ -1,6 +1,8 @@
 let state = {
   skills: [],
   workflows: [],
+  context: [],
+  suggestions: '',
   activeTab: 'home',
   teamMode: false,
   selectedSkill: null,
@@ -11,17 +13,33 @@ let state = {
     col: 'name',
     dir: 'asc'
   },
+  funnel: null,
+  funnelLoaded: false,
+  funnelPeriod: 'last_30_days',
+  funnelExpanded: new Set,
+  funnelEmails: {},
   pipelineLoaded: false,
   renewalsLoaded: false,
   movementLoaded: false,
+  bookingsLoaded: false,
+  shippingLoaded: false,
   audienceLoaded: false,
+  calendarLoaded: false,
   ccalLoaded: false,
-  activeSub: {}
+  activeSub: {},
+  contextPath: [],
+  contextFile: null,
+  watchdog: {
+    last_run_at: null,
+    runs: []
+  },
+  watchdogLoaded: false,
+  watchdogStatusFilter: null
 };
 
 async function init() {
   await applyConfig();
-  await Promise.all([ fetchSkills(), fetchWorkflows(), fetchSponsors() ]);
+  await Promise.all([ fetchSkills(), fetchWorkflows(), fetchContext(), fetchSuggestions(), fetchSponsors() ]);
   initNav();
   initSidebarResize();
   initThemeSwitch();
@@ -51,6 +69,19 @@ async function fetchSkills() {
 async function fetchWorkflows() {
   const res = await fetch('/api/workflows');
   state.workflows = await res.json();
+}
+
+async function fetchContext() {
+  const res = await fetch('/api/context');
+  state.context = await res.json();
+  renderContext();
+}
+
+async function fetchSuggestions() {
+  const res = await fetch('/api/suggestions');
+  const data = await res.json();
+  state.suggestions = data.content;
+  renderSuggestions();
 }
 
 const LOGOS = {
@@ -569,7 +600,7 @@ function homeDelivery(today, tISO, fwd) {
     all = new Set(PULSE.campaigns.map((c => key(c.name, c.sponsor))));
     items.filter((it => it.date >= tISO)).forEach((it => all.add(key(it.name.split(' - ')[0], it.phase))));
   }
-  return `<div class="home-cards home-cards-4">\n    ${homeCard('Deliverables, next 30 days', next30 ?? dash, 'on the Deliverables calendar', null, null)}\n    ${homeCard('Going out this week', thisWeek ?? dash, `today through Sunday ${DAYS_SHORT(sunday)}`, null, null)}\n    ${homeCard('Active campaigns', active ? active.size : dash, 'sponsor phases with deliverables out', 'fulfilment', null)}\n    ${homeCard('Active + future booked', all ? all.size : dash, all && active ? `${all.size - active.size} more booked to start` : '', 'fulfilment', null)}\n  </div>`;
+  return `<div class="home-cards home-cards-4">\n    ${homeCard('Deliverables, next 30 days', next30 ?? dash, 'on the Deliverables calendar', 'calendar', null)}\n    ${homeCard('Going out this week', thisWeek ?? dash, `today through Sunday ${DAYS_SHORT(sunday)}`, 'calendar', null)}\n    ${homeCard('Active campaigns', active ? active.size : dash, 'sponsor phases with deliverables out', 'fulfilment', null)}\n    ${homeCard('Active + future booked', all ? all.size : dash, all && active ? `${all.size - active.size} more booked to start` : '', 'fulfilment', null)}\n  </div>`;
 }
 
 const DAYS_SHORT = iso => new Date(iso + 'T12:00:00').toLocaleDateString('en-GB', {
@@ -605,7 +636,7 @@ function homeRender() {
     const prior = SUBS.main.filter((p => p.date <= t)).slice(-1)[0];
     netAdds = prior ? cur - prior.recipients : null;
   }
-  const cards = [ homeCard('Revenue run-rate', avgMonth90 == null ? dash : `${fmtMoney(Math.round(avgMonth90))}<span class="home-unit">/mo</span>`, avgMonth90 == null ? '' : `<span class="home-goalbar"><i style="width:${Math.min(100, avgMonth90 / HOME_TARGET * 100).toFixed(1)}%"></i></span>${Math.round(avgMonth90 / HOME_TARGET * 100)}% of ${fmtMoney(HOME_TARGET)}/mo · avg of last 90d`, null, null, true), homeCard('Delivered, last 30d', delivered30 == null ? dash : fmtMoney(delivered30), 'revenue recognised', null, null), homeCard('Booked, next 30d', booked30 == null ? dash : fmtMoney(booked30), 'already confirmed', null, null), homeCard('All future booked', futureTotal == null ? dash : fmtMoney(futureTotal), BOOK.entries.length ? `${BOOK.entries.filter((x => x.date > tISO)).length} deliverables` : '', null, null), homeCard('Open pipeline', openVal == null ? dash : fmtMoney(openVal), weighted == null ? '' : fmtMoney(weighted) + ' weighted', 'pipeline', null), homeCard('Total audience', subs == null ? dash : subN(subs + (FOLLOWERS.data?.followers?.linkedin || 0) + (FOLLOWERS.data?.followers?.x || 0)), FOLLOWERS.data ? `beehiiv + LinkedIn + X${netAdds == null ? '' : ` · ${netAdds >= 0 ? '+' : ''}${subN(netAdds)} subs in 30d`}` : 'beehiiv only until followers load', 'audience', null) ];
+  const cards = [ homeCard('Revenue run-rate', avgMonth90 == null ? dash : `${fmtMoney(Math.round(avgMonth90))}<span class="home-unit">/mo</span>`, avgMonth90 == null ? '' : `<span class="home-goalbar"><i style="width:${Math.min(100, avgMonth90 / HOME_TARGET * 100).toFixed(1)}%"></i></span>${Math.round(avgMonth90 / HOME_TARGET * 100)}% of ${fmtMoney(HOME_TARGET)}/mo · avg of last 90d`, 'revmodel', null, true), homeCard('Delivered, last 30d', delivered30 == null ? dash : fmtMoney(delivered30), 'revenue recognised', 'bookings', null), homeCard('Booked, next 30d', booked30 == null ? dash : fmtMoney(booked30), 'already confirmed', 'bookings', null), homeCard('All future booked', futureTotal == null ? dash : fmtMoney(futureTotal), BOOK.entries.length ? `${BOOK.entries.filter((x => x.date > tISO)).length} deliverables` : '', 'bookings', null), homeCard('Open pipeline', openVal == null ? dash : fmtMoney(openVal), weighted == null ? '' : fmtMoney(weighted) + ' weighted', 'pipeline', null), homeCard('Total audience', subs == null ? dash : subN(subs + (FOLLOWERS.data?.followers?.linkedin || 0) + (FOLLOWERS.data?.followers?.x || 0)), FOLLOWERS.data ? `beehiiv + LinkedIn + X${netAdds == null ? '' : ` · ${netAdds >= 0 ? '+' : ''}${subN(netAdds)} subs in 30d`}` : 'beehiiv only until followers load', 'audience', null) ];
   calBindChipTips();
   let shipping = '<div class="pipe-empty">Loading&hellip;</div>';
   if (CAL.data) {
@@ -671,7 +702,7 @@ const PRELOAD_STALE_MS = 10 * 60 * 1e3;
 function preloadAll() {
   lastPreload = Date.now();
   const run = fn => Promise.resolve().then(fn).catch((() => {})).then((() => homeRender()));
-  const jobs = [ fetchFollowers, fetchPipeline, fetchRenewals, fetchMovement, fetchBookings, fetchCalendar, fetchAudience, initPulse, () => window.DailyDeck?.prefetch(), fetchSkillPeople, () => {
+  const jobs = [ fetchFollowers, fetchPipeline, fetchRenewals, fetchMovement, fetchBookings, fetchCalendar, fetchAudience, fetchWatchdog, fetchShipping, initPulse, () => fetchFunnel(), () => window.RevenueModel?.show(), fetchSkillPeople, () => {
     if (!state.ccalLoaded) return fetchContentCalendar();
   } ];
   jobs.forEach(run);
@@ -768,20 +799,100 @@ function navTo(tabId, sub) {
   }
   if (tabId !== 'skills' && tabId !== 'skillpeople' && state.drawerOpen) closeDrawer();
   if (tabId === 'skillpeople') fetchSkillPeople();
+  if (tabId === 'funnel' && !state.funnelLoaded) fetchFunnel();
   if (tabId === 'pipeline' && !state.pipelineLoaded) {
     fetchPipeline();
     fetchRenewals();
     fetchMovement();
   }
+  if (tabId === 'bookings' && !state.bookingsLoaded) fetchBookings();
+  if (tabId === 'shipping' && !state.shippingLoaded) fetchShipping();
   if (tabId === 'audience' && !state.audienceLoaded) fetchAudience();
+  if (tabId === 'calendar' && !state.calendarLoaded) fetchCalendar();
   if (tabId === 'contentcal' && !state.ccalLoaded) fetchContentCalendar();
+  if (tabId === 'watchdog' && !state.watchdogLoaded) fetchWatchdog();
   if (tabId === 'fulfilment') initPulse();
-  window.DailyDeck?.close();
+  if (tabId === 'social') initSocial();
+  if (tabId === 'revmodel') window.RevenueModel?.show();
   if (tabId === 'dailies') window.DailyTriage?.show();
 }
 
 function switchTab(tabId) {
   navTo(tabId);
+}
+
+let socialFrameWired = false;
+
+function initSocial() {
+  const frame = document.getElementById('socialFrame');
+  if (!frame) return;
+  if (!frame.getAttribute('src')) frame.src = 'social/index.html?embed=1';
+  if (socialFrameWired) return;
+  socialFrameWired = true;
+  const fit = () => {
+    try {
+      const doc = frame.contentWindow && frame.contentWindow.document;
+      if (doc && doc.body) frame.style.height = doc.body.scrollHeight + 8 + 'px';
+    } catch (e) {}
+  };
+  frame.addEventListener('load', (() => {
+    fit();
+    try {
+      new ResizeObserver(fit).observe(frame.contentWindow.document.body);
+    } catch (e) {
+      setInterval(fit, 1500);
+    }
+  }));
+}
+
+async function fetchFunnel(refresh = false) {
+  state.funnelLoaded = true;
+  const container = document.getElementById('funnelContainer');
+  container.innerHTML = '<div class="funnel-loading">Loading&hellip;</div>';
+  try {
+    const params = new URLSearchParams({
+      period: state.funnelPeriod
+    });
+    if (refresh) params.set('refresh', '1');
+    const res = await fetch('/api/funnel/strategyhub?' + params);
+    state.funnel = await res.json();
+    renderFunnel();
+  } catch (e) {
+    container.innerHTML = `<div class="funnel-error">Failed to load: ${e.message}</div>`;
+  }
+}
+
+function refreshFunnel() {
+  state.funnelEmails = {};
+  fetchFunnel(true);
+}
+
+function setFunnelPeriod(period) {
+  state.funnelPeriod = period;
+  state.funnelExpanded = new Set;
+  fetchFunnel(false);
+}
+
+async function toggleAutomation(autId) {
+  if (state.funnelExpanded.has(autId)) {
+    state.funnelExpanded.delete(autId);
+    renderFunnel();
+    return;
+  }
+  state.funnelExpanded.add(autId);
+  renderFunnel();
+  if (!state.funnelEmails[autId]) {
+    try {
+      const res = await fetch(`/api/funnel/automation/${autId}/emails`);
+      state.funnelEmails[autId] = await res.json();
+    } catch (e) {
+      state.funnelEmails[autId] = {
+        error: e.message,
+        emails: []
+      };
+    }
+    renderFunnel();
+  }
 }
 
 function fmt(n) {
@@ -795,6 +906,156 @@ function fmtMoney(n) {
 
 function pct(num, den, dp = 1) {
   return den > 0 ? (num / den * 100).toFixed(dp) + '%' : '-';
+}
+
+function fmtTs(ts) {
+  if (!ts) return '-';
+  const ms = ts > 1e12 ? ts : ts * 1e3;
+  return new Date(ms).toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+}
+
+function renderPeriodPills() {
+  const wrap = document.getElementById('funnelPeriodPills');
+  if (!state.funnel?.available_periods) return;
+  wrap.innerHTML = state.funnel.available_periods.map((p => `\n    <button class="period-pill ${p.id === state.funnelPeriod ? 'active' : ''}" onclick="setFunnelPeriod('${p.id}')">\n      ${escapeHtml(p.label)}\n    </button>\n  `)).join('');
+}
+
+function renderFunnel() {
+  const d = state.funnel;
+  if (!d) return;
+  const meta = document.getElementById('funnelMeta');
+  const stamp = d.generated_at ? new Date(d.generated_at).toLocaleString() : '-';
+  meta.textContent = `Updated ${stamp}${d.cached ? ' · cached' : ''}`;
+  renderPeriodPills();
+  const errBlock = d.errors && d.errors.length ? `<div class="funnel-error">${d.errors.map((e => `<div>${escapeHtml(e)}</div>`)).join('')}</div>` : '';
+  const landingTotal = d.landing.total_visitors;
+  const landingRev = d.landing.total_revenue;
+  const periodPurchases = d.purchases.completions;
+  const isLifetimeView = state.funnelPeriod === 'all_time';
+  const feedTotalLifetime = d.feed.totals.enrolled;
+  const unifiedTotalLifetime = d.unified.totals.enrolled;
+  const unifiedCompletedLifetime = d.unified.totals.completed;
+  const feedPeriod = d.feed.period_totals?.enrolled ?? null;
+  const unifiedPeriod = d.unified.period_totals?.enrolled ?? null;
+  const unifiedPeriodCompleted = d.unified.period_totals?.completed ?? null;
+  const feedTotal = isLifetimeView ? feedTotalLifetime : feedPeriod ?? feedTotalLifetime;
+  const unifiedTotal = isLifetimeView ? unifiedTotalLifetime : unifiedPeriod ?? unifiedTotalLifetime;
+  const unifiedCompleted = isLifetimeView ? unifiedCompletedLifetime : unifiedPeriodCompleted ?? unifiedCompletedLifetime;
+  const purchasesLifetime = d.purchases_all_time.completions;
+  const revenueLifetime = d.purchases_all_time.revenue || 0;
+  const snapshot = `\n    <div class="funnel-snapshot">\n      <div class="funnel-snapshot-label">${escapeHtml(d.period_label)} snapshot <span class="dim">· web analytics</span></div>\n      <div class="funnel-snapshot-stats">\n        ${snapStat('Landing visitors', fmt(landingTotal))}\n        ${snapStat('Site visitors', fmt(d.overview.visitors))}\n        ${snapStat('Purchases', fmt(periodPurchases))}\n        ${snapStat('Revenue', fmtMoney(landingRev))}\n        ${snapStat('Visitor → purchase', pct(periodPurchases, landingTotal, 2))}\n      </div>\n    </div>\n  `;
+  const stripeRevenueLifetime = d.stripe?.lifetime?.revenue || revenueLifetime;
+  const stripePurchasesLifetime = d.stripe?.lifetime?.purchase_count || purchasesLifetime;
+  const stripePurchasesPeriod = d.stripe?.period?.purchase_count ?? null;
+  const stripeRevenuePeriod = d.stripe?.period?.revenue ?? null;
+  const purchasesValue = isLifetimeView ? stripePurchasesLifetime : stripePurchasesPeriod ?? stripePurchasesLifetime;
+  const purchasesRevenue = isLifetimeView ? stripeRevenueLifetime : stripeRevenuePeriod ?? stripeRevenueLifetime;
+  const ofLifetime = (period, lifetime) => period == null || period === lifetime ? '' : ` <span class="dim">of ${fmt(lifetime)} lifetime</span>`;
+  const periodOrLifetime = isLifetimeView ? 'lifetime' : escapeHtml(d.period_label);
+  const funnel = `\n    <div class="vfunnel">\n      ${stageRow({
+    kind: 'feed',
+    title: '[FEED] entry-point automations',
+    value: feedTotal,
+    sub: `${d.feed.count} live entry points · ${periodOrLifetime}${isLifetimeView ? '' : ofLifetime(feedPeriod, feedTotalLifetime)} · click any to drill in`,
+    children: feedAutomationStrip(d),
+    widthPct: 100
+  })}\n      ${arrowConv(unifiedTotal, feedTotal, '[FEED] → [UNIFIED]', 'graduate rate to welcome offer', false)}\n      ${stageRow({
+    kind: 'unified',
+    title: '[UNIFIED] welcome offer',
+    value: unifiedTotal,
+    sub: `${d.unified.count} live automations · ${fmt(unifiedCompleted)} completed (${pct(unifiedCompleted, unifiedTotal)})${isLifetimeView ? '' : ofLifetime(unifiedPeriod, unifiedTotalLifetime)}`,
+    children: unifiedAutomationStrip(d),
+    widthPct: 70
+  })}\n      ${arrowConv(purchasesValue, unifiedTotal, '[UNIFIED] → purchases', `sequence-to-sale (${periodOrLifetime})`, false)}\n      ${stageRow({
+    kind: 'purchase',
+    title: `Purchases (${periodOrLifetime})`,
+    value: purchasesValue,
+    sub: `${fmtMoney(purchasesRevenue)} revenue · ${periodOrLifetime}${isLifetimeView ? '' : ofLifetime(stripePurchasesPeriod, stripePurchasesLifetime)}`,
+    children: purchaseStrip(d.purchases_all_time),
+    widthPct: 45
+  })}\n    </div>\n  `;
+  const beehiivCaveat = `\n    <div class="funnel-caveat">\n      <strong>Period vs lifetime.</strong> The funnel above tracks the period pills - pick "All time" for lifetime numbers, or any other window for period-bounded counts. FEED/UNIFIED period counts are derived by walking Beehiiv's journey records; "of X lifetime" subtitles let you compare. Per-email open/click rates aren't in Beehiiv's public API; drill into an automation to see subjects + send timestamps and open in Beehiiv for engagement.\n    </div>\n  `;
+  const landingTable = `\n    <section class="funnel-section">\n      <div class="funnel-section-header">\n        <h3>Landing pages - top paths (${d.period_label})</h3>\n        <span class="funnel-section-total">${fmt(landingTotal)} visitors · ${fmtMoney(d.landing.total_revenue)}</span>\n      </div>\n      ${Object.entries(d.landing.by_host).sort(((a, b) => b[1].visitors - a[1].visitors)).map((([host, info]) => `\n        <div class="funnel-group">\n          <div class="funnel-group-header">\n            <span class="funnel-group-name">${escapeHtml(host)}</span>\n            <span class="funnel-group-total">${fmt(info.visitors)} visitors · ${fmtMoney(info.revenue)}</span>\n          </div>\n          <table class="funnel-table">\n            <thead><tr><th>Path</th><th class="num">Visitors</th><th class="num">Revenue</th></tr></thead>\n            <tbody>\n              ${info.pages.slice(0, 12).map((p => `\n                <tr>\n                  <td><a href="${escapeHtml(p.url)}" target="_blank" rel="noopener" class="funnel-link">${escapeHtml(p.path)}</a></td>\n                  <td class="num">${fmt(p.visitors)}</td>\n                  <td class="num">${p.revenue ? fmtMoney(p.revenue) : '-'}</td>\n                </tr>\n              `)).join('')}\n              ${info.pages.length > 12 ? `<tr><td colspan="3" class="funnel-more">&hellip; and ${info.pages.length - 12} more paths</td></tr>` : ''}\n            </tbody>\n          </table>\n        </div>\n      `)).join('')}\n    </section>\n  `;
+  document.getElementById('funnelContainer').innerHTML = `\n    ${errBlock}\n    ${snapshot}\n    ${stripeBlock(d)}\n    ${funnel}\n    ${beehiivCaveat}\n    ${landingTable}\n  `;
+}
+
+function snapStat(label, value) {
+  return `\n    <div class="snap-stat">\n      <div class="snap-stat-value">${value}</div>\n      <div class="snap-stat-label">${escapeHtml(label)}</div>\n    </div>\n  `;
+}
+
+function pctRaw(rate, dp = 1) {
+  return ((rate || 0) * 100).toFixed(dp) + '%';
+}
+
+function stripeBlock(d) {
+  const s = d.stripe;
+  if (!s) return '';
+  if (!s.configured) {
+    return `<div class="funnel-snapshot stripe-snapshot"><div class="funnel-snapshot-label">Stripe <span class="dim">· not connected</span></div></div>`;
+  }
+  if (s.error && !s.period) {
+    return `\n      <div class="funnel-snapshot stripe-snapshot">\n        <div class="funnel-snapshot-label">Stripe <span class="dim">· error</span></div>\n        <div class="funnel-error"><div>${escapeHtml(s.error)}</div></div>\n      </div>\n    `;
+  }
+  const p = s.period || {};
+  const lt = s.lifetime || {};
+  const top = (p.top_offers || []).slice(0, 8);
+  const refundedNote = p.refunded_revenue ? `<span class="dim"> (${fmtMoney(p.refunded_revenue)} refunded)</span>` : '';
+  const stats = `\n    <div class="funnel-snapshot-label">${escapeHtml(d.period_label)} · Stripe <span class="dim">· StrategyHub checkout</span></div>\n    <div class="funnel-snapshot-stats stripe-stats">\n      ${snapStat('Net revenue', fmtMoney(p.revenue) + refundedNote)}\n      ${snapStat('Purchases', fmt(p.purchase_count))}\n      ${snapStat('Refund rate', pctRaw(p.refund_rate))}\n      ${snapStat('Upsell rate', pctRaw(p.upsell_rate))}\n      ${snapStat('Customers', fmt(p.customers))}\n    </div>\n    <div class="stripe-lifetime">\n      Lifetime: ${fmtMoney(lt.revenue)} net · ${fmt(lt.purchase_count)} purchases · ${fmt(lt.customers)} customers · ${pctRaw(lt.upsell_rate)} upsell\n    </div>\n  `;
+  const offersTable = top.length === 0 ? '' : `\n    <div class="stripe-offers">\n      <div class="stripe-offers-label">Top offers - ${escapeHtml(d.period_label)}</div>\n      <table class="funnel-table">\n        <thead><tr><th>Offer</th><th class="num">Purchases</th><th class="num">Revenue</th><th class="num">Avg</th></tr></thead>\n        <tbody>\n          ${top.map((o => `\n            <tr>\n              <td>${escapeHtml(o.name)}</td>\n              <td class="num">${fmt(o.purchases)}</td>\n              <td class="num">${fmtMoney(o.revenue)}</td>\n              <td class="num dim">${fmtMoney(o.purchases ? o.revenue / o.purchases : 0)}</td>\n            </tr>\n          `)).join('')}\n        </tbody>\n      </table>\n    </div>\n  `;
+  const cap = s.counts?.page_capped ? `<div class="stripe-cap">Showing the most recent ${fmt(s.counts.lifetime_charges_fetched)} charges (Stripe pagination cap reached).</div>` : '';
+  return `\n    <div class="funnel-snapshot stripe-snapshot">\n      ${stats}\n      ${cap}\n      ${offersTable}\n    </div>\n  `;
+}
+
+function stageRow({kind: kind, title: title, value: value, sub: sub, children: children, widthPct: widthPct}) {
+  return `\n    <div class="vfunnel-stage" style="max-width: ${widthPct}%">\n      <div class="vfunnel-stage-inner vfunnel-${kind}">\n        <div class="vfunnel-head">\n          <div class="vfunnel-title">${escapeHtml(title)}</div>\n          <div class="vfunnel-value">${fmt(value)}</div>\n          <div class="vfunnel-sub">${sub}</div>\n        </div>\n        ${children ? `<div class="vfunnel-children">${children}</div>` : ''}\n      </div>\n    </div>\n  `;
+}
+
+function arrowConv(num, den, label, hint, optional) {
+  const conv = pct(num, den);
+  return `\n    <div class="vfunnel-arrow ${optional ? 'is-optional' : ''}">\n      <div class="vfunnel-arrow-line"></div>\n      <div class="vfunnel-arrow-conv">\n        <span class="vfunnel-arrow-pct">${conv}</span>\n        <span class="vfunnel-arrow-label">${escapeHtml(label)}</span>\n        ${hint ? `<span class="vfunnel-arrow-hint">${escapeHtml(hint)}</span>` : ''}\n      </div>\n    </div>\n  `;
+}
+
+function feedAutomationStrip(d) {
+  return d.feed.automations.map((a => automationCard(a, 'feed'))).join('');
+}
+
+function unifiedAutomationStrip(d) {
+  return d.unified.automations.map((a => automationCard(a, 'unified'))).join('');
+}
+
+function automationCard(a, kind) {
+  const isOpen = state.funnelExpanded.has(a.id);
+  const completion = pct(a.completed, a.enrolled);
+  const periodEnrolled = a.period?.enrolled;
+  const periodInline = periodEnrolled != null && state.funnelPeriod !== 'all_time' ? `<span class="vfunnel-aut-period"><span class="dim">${escapeHtml(state.funnel?.period_label || 'period')}</span> ${fmt(periodEnrolled)}</span>` : '';
+  return `\n    <div class="vfunnel-aut ${isOpen ? 'is-open' : ''}">\n      <button class="vfunnel-aut-head" onclick="toggleAutomation('${a.id}')">\n        <span class="vfunnel-aut-caret">${isOpen ? '▾' : '▸'}</span>\n        <span class="vfunnel-aut-name">${escapeHtml(a.name)}</span>\n        <span class="vfunnel-aut-stats">\n          ${periodInline}\n          <span><span class="dim">lifetime enrol</span> ${fmt(a.enrolled)}</span>\n          <span><span class="dim">done</span> ${fmt(a.completed)}</span>\n          <span><span class="dim">→</span> ${completion}</span>\n        </span>\n      </button>\n      ${isOpen ? renderAutomationDetail(a, kind) : ''}\n    </div>\n  `;
+}
+
+function renderAutomationDetail(a, kind) {
+  const emailData = state.funnelEmails[a.id];
+  const inProgressBar = a.enrolled > 0 ? `\n    <div class="vfunnel-aut-bar">\n      <div class="vfunnel-aut-bar-completed" style="width:${(a.completed / a.enrolled * 100).toFixed(1)}%" title="Completed: ${fmt(a.completed)}"></div>\n      <div class="vfunnel-aut-bar-progress" style="width:${(a.in_progress / a.enrolled * 100).toFixed(1)}%" title="In progress: ${fmt(a.in_progress)}"></div>\n      <div class="vfunnel-aut-bar-exited" style="width:${(a.exited / a.enrolled * 100).toFixed(1)}%" title="Exited early: ${fmt(a.exited)}"></div>\n    </div>\n    <div class="vfunnel-aut-bar-legend">\n      <span><span class="legend-sw legend-sw-completed"></span>Completed ${fmt(a.completed)} (${pct(a.completed, a.enrolled)})</span>\n      <span><span class="legend-sw legend-sw-progress"></span>In progress ${fmt(a.in_progress)} (${pct(a.in_progress, a.enrolled)})</span>\n      <span><span class="legend-sw legend-sw-exited"></span>Exited ${fmt(a.exited)} (${pct(a.exited, a.enrolled)})</span>\n    </div>\n  ` : '';
+  let emailsBlock = '<div class="vfunnel-emails-loading">Loading emails…</div>';
+  if (emailData) {
+    if (emailData.error) {
+      emailsBlock = `<div class="vfunnel-error-inline">${escapeHtml(emailData.error)}</div>`;
+    } else if (emailData.emails.length === 0) {
+      emailsBlock = '<div class="vfunnel-emails-empty">No emails in this automation.</div>';
+    } else {
+      emailsBlock = `\n        <div class="vfunnel-emails-note">Per-email open/click rates aren't in Beehiiv's public API - open the automation in Beehiiv for the full breakdown.</div>\n        <table class="funnel-table">\n          <thead><tr><th>#</th><th>Subject</th><th>First sent</th><th>Last sent</th><th>Status</th></tr></thead>\n          <tbody>\n            ${emailData.emails.map(((e, i) => `\n              <tr>\n                <td class="num">${i + 1}</td>\n                <td>${escapeHtml(e.subject_line || '(no subject)')}</td>\n                <td class="num dim">${fmtTs(e.first_sent_at)}</td>\n                <td class="num dim">${fmtTs(e.last_sent_at)}</td>\n                <td class="num"><span class="email-status email-status-${e.status}">${escapeHtml(e.status || '')}</span></td>\n              </tr>\n            `)).join('')}\n          </tbody>\n        </table>\n      `;
+    }
+  }
+  return `\n    <div class="vfunnel-aut-body">\n      ${a.description ? `<div class="vfunnel-aut-desc">${escapeHtml(a.description.split('\n')[0].slice(0, 200))}</div>` : ''}\n      ${inProgressBar}\n      ${emailsBlock}\n      <div class="vfunnel-aut-actions">\n        <a href="${escapeHtml(a.beehiiv_url)}" target="_blank" rel="noopener" class="funnel-link">Open in Beehiiv ↗</a>\n      </div>\n    </div>\n  `;
+}
+
+function purchaseStrip(p) {
+  if (!p.by_goal || p.by_goal.length === 0) {
+    return `<div class="vfunnel-empty">No goal completions tracked yet.</div>`;
+  }
+  return p.by_goal.map((g => `\n    <div class="vfunnel-chip vfunnel-chip-purchase">\n      <div class="vfunnel-chip-num">${fmt(g.completions)}</div>\n      <div class="vfunnel-chip-name">${escapeHtml(g.goal)}</div>\n      <div class="vfunnel-chip-meta">${fmt(g.visitors)} visitors</div>\n    </div>\n  `)).join('');
 }
 
 function initDrawer() {
@@ -896,6 +1157,18 @@ function connectSSE() {
        case 'skills':
         fetchSkills();
         fetchWorkflows();
+        break;
+
+       case 'context':
+        fetchContext();
+        break;
+
+       case 'suggestions':
+        fetchSuggestions();
+        break;
+
+       case 'watchdog':
+        fetchWatchdog();
         break;
       }
     }
@@ -1079,6 +1352,202 @@ function renderSkills() {
   view.querySelectorAll('.sk-row').forEach((r => r.addEventListener('click', (() => openDrawer(r.dataset.id)))));
 }
 
+function buildContextTree(files) {
+  const root = {
+    name: '',
+    children: {},
+    files: [],
+    isDir: true
+  };
+  files.forEach((f => {
+    const parts = f.path.split('/');
+    let node = root;
+    for (let i = 0; i < parts.length - 1; i++) {
+      const seg = parts[i];
+      node.children[seg] = node.children[seg] || {
+        name: seg,
+        children: {},
+        files: [],
+        isDir: true
+      };
+      node = node.children[seg];
+    }
+    node.files.push({
+      ...f,
+      name: parts[parts.length - 1]
+    });
+  }));
+  return root;
+}
+
+function renderContext() {
+  const container = document.getElementById('contextContainer');
+  if (!container) return;
+  if (!state.context || state.context.length === 0) {
+    container.innerHTML = '<div class="empty-state">No context files found</div>';
+    return;
+  }
+  const tree = buildContextTree(state.context);
+  let base = tree;
+  while (Object.keys(base.children).length === 1 && base.files.length === 0) {
+    base = base.children[Object.keys(base.children)[0]];
+  }
+  const cols = [ base ];
+  let node = base;
+  for (const seg of state.contextPath) {
+    if (node.children[seg]) {
+      node = node.children[seg];
+      cols.push(node);
+    } else break;
+  }
+  const sortDirs = c => Object.values(c.children).sort(((a, b) => a.name.localeCompare(b.name)));
+  const sortFiles = c => [ ...c.files ].sort(((a, b) => a.name.localeCompare(b.name)));
+  const stale = state.context.filter((f => f.staleness === 'stale')).length;
+  const aging = state.context.filter((f => f.staleness === 'aging')).length;
+  const fresh = state.context.length - stale - aging;
+  let html = `<div class="ctx-summary">\n    <span><span class="staleness-dot fresh"></span>${fresh} fresh</span>\n    <span><span class="staleness-dot aging"></span>${aging} aging (7-30d)</span>\n    <span><span class="staleness-dot stale"></span>${stale} stale (30d+)</span>\n    <span class="ctx-summary-total">${state.context.length} files</span>\n  </div>`;
+  html += '<div class="ctx-cols">';
+  cols.forEach(((col, ci) => {
+    html += '<div class="ctx-col">';
+    sortDirs(col).forEach((d => {
+      const sel = state.contextPath[ci] === d.name;
+      const count = Object.keys(d.children).length + d.files.length;
+      const all = [];
+      (function walk(n) {
+        n.files.forEach((f => all.push(f.staleness)));
+        Object.values(n.children).forEach(walk);
+      })(d);
+      const worst = all.includes('stale') ? 'stale' : all.includes('aging') ? 'aging' : 'fresh';
+      html += `<div class="ctx-row dir ${sel ? 'sel' : ''}" data-depth="${ci}" data-name="${escapeHtml(d.name)}">\n        <span class="ctx-folder">▸</span>\n        <span class="ctx-name">${escapeHtml(d.name)}</span>\n        <span class="staleness-dot ${worst}" title="worst file in folder"></span>\n        <span class="ctx-meta">${count}</span>\n      </div>`;
+    }));
+    sortFiles(col).forEach((f => {
+      const sel = state.contextFile === f.path;
+      html += `<div class="ctx-row file ${sel ? 'sel' : ''}" data-file="${escapeHtml(f.path)}">\n        <span class="staleness-dot ${f.staleness}"></span>\n        <span class="ctx-name">${escapeHtml(f.name)}</span>\n        <span class="ctx-age ${f.staleness}">${f.daysSinceUpdate}d</span>\n      </div>`;
+    }));
+    html += '</div>';
+  }));
+  const sf = state.contextFile && state.context.find((f => f.path === state.contextFile));
+  if (sf) {
+    html += `<div class="ctx-col ctx-detail">\n      <div class="ctx-detail-name">${escapeHtml(sf.path.split('/').pop())}</div>\n      <div class="ctx-detail-badge ${sf.staleness}">${sf.staleness}</div>\n      <div class="ctx-detail-row"><span>Path</span><b>${escapeHtml(sf.path)}</b></div>\n      <div class="ctx-detail-row"><span>Updated</span><b>${formatDate(sf.lastModified)}</b></div>\n      <div class="ctx-detail-row"><span>Age</span><b class="${sf.staleness}">${sf.daysSinceUpdate} days</b></div>\n      <div class="ctx-detail-row"><span>Size</span><b>${formatSize(sf.size)}</b></div>\n    </div>`;
+  }
+  html += '</div>';
+  container.innerHTML = html;
+  container.querySelectorAll('.ctx-row.dir').forEach((r => r.addEventListener('click', (() => {
+    const depth = +r.dataset.depth;
+    state.contextPath = state.contextPath.slice(0, depth);
+    state.contextPath[depth] = r.dataset.name;
+    state.contextFile = null;
+    renderContext();
+  }))));
+  container.querySelectorAll('.ctx-row.file').forEach((r => r.addEventListener('click', (() => {
+    state.contextFile = r.dataset.file;
+    renderContext();
+  }))));
+}
+
+function renderSuggestions() {
+  const container = document.getElementById('suggestionsContainer');
+  container.className = 'suggestions-content';
+  const content = state.suggestions;
+  const sections = content.split(/^## /m).filter(Boolean);
+  if (sections.length <= 1 && !content.includes('**Pattern')) {
+    container.innerHTML = `<div class="empty-state">No skill suggestions yet. Claude will add them as patterns emerge.</div>`;
+    return;
+  }
+  const items = sections.filter((s => s.startsWith('/') || s.match(/^\S/)));
+  container.innerHTML = items.map((section => {
+    const lines = section.trim().split('\n');
+    const name = lines[0].trim();
+    const body = lines.slice(1).join('\n').trim();
+    const fields = [];
+    const fieldRegex = /\*\*([^*]+)\*\*[:\s]*(.+?)(?=\n\*\*|\n*$)/gs;
+    let match;
+    while ((match = fieldRegex.exec(body)) !== null) {
+      fields.push({
+        label: match[1].trim(),
+        value: match[2].trim()
+      });
+    }
+    return `\n      <div class="suggestion-item">\n        <div class="suggestion-name">${name}</div>\n        ${fields.map((f => `\n          <div class="suggestion-field"><strong>${f.label}:</strong> ${f.value}</div>\n        `)).join('')}\n      </div>\n    `;
+  })).join('');
+}
+
+const WATCHDOG_STATUS_COLORS = {
+  drafted: 'var(--fresh)',
+  nudged: 'var(--aging)',
+  blocked: 'var(--stale)',
+  skipped_not_ours: 'var(--text-dim)',
+  unmatched: 'var(--brand-purple)'
+};
+
+const WATCHDOG_STATUS_LABELS = {
+  drafted: 'Drafted',
+  nudged: 'Nudged',
+  blocked: 'Blocked',
+  skipped_not_ours: 'Not ours',
+  unmatched: 'Unmatched'
+};
+
+async function fetchWatchdog() {
+  state.watchdogLoaded = true;
+  try {
+    const res = await fetch('/api/watchdog');
+    state.watchdog = await res.json();
+  } catch {
+    state.watchdog = {
+      last_run_at: null,
+      runs: []
+    };
+  }
+  renderWatchdog();
+}
+
+function filterWatchdogStatus(status) {
+  state.watchdogStatusFilter = state.watchdogStatusFilter === status ? null : status;
+  renderWatchdog();
+}
+
+function latestWatchdogRun() {
+  const runs = state.watchdog.runs || [];
+  return runs.length ? runs[runs.length - 1] : null;
+}
+
+function watchdogStatusBadge(status) {
+  const color = WATCHDOG_STATUS_COLORS[status] || 'var(--text-dim)';
+  const label = WATCHDOG_STATUS_LABELS[status] || status || '-';
+  return `<span class="draft-status-badge" style="background: color-mix(in srgb, ${color} 15%, transparent); color: ${color}">${label}</span>`;
+}
+
+function renderWatchdog() {
+  const container = document.getElementById('watchdogContainer');
+  const countEl = document.getElementById('watchdogCount');
+  const lastRunEl = document.getElementById('watchdogLastRun');
+  const badge = document.getElementById('watchdogBlockedBadge');
+  if (!container) return;
+  const latest = latestWatchdogRun();
+  const tasks = latest ? latest.tasks || [] : [];
+  if (lastRunEl) lastRunEl.textContent = state.watchdog.last_run_at ? formatDate(state.watchdog.last_run_at) : 'never';
+  if (countEl) countEl.textContent = tasks.length ? `(${tasks.length})` : '';
+  const blockedCount = tasks.filter((t => t.status === 'blocked' || t.status === 'unmatched')).length;
+  if (badge) {
+    badge.textContent = blockedCount > 0 ? blockedCount : '';
+    badge.style.display = blockedCount > 0 ? '' : 'none';
+  }
+  const filtersEl = document.getElementById('watchdogFilters');
+  if (filtersEl) {
+    const statuses = Object.keys(WATCHDOG_STATUS_LABELS).filter((s => tasks.some((t => t.status === s))));
+    filtersEl.innerHTML = statuses.map((s => `\n      <button class="filter-pill ${state.watchdogStatusFilter === s ? 'active' : ''}"\n              style="--pill-color: ${WATCHDOG_STATUS_COLORS[s]}"\n              onclick="filterWatchdogStatus('${s}')">${WATCHDOG_STATUS_LABELS[s]}</button>\n    `)).join('');
+  }
+  if (!latest || tasks.length === 0) {
+    container.innerHTML = '<div class="empty-state">No runs yet. The watchdog runs automatically each morning.</div>';
+    return;
+  }
+  const visibleTasks = state.watchdogStatusFilter ? tasks.filter((t => t.status === state.watchdogStatusFilter)) : tasks;
+  const rows = visibleTasks.map((t => `\n    <tr>\n      <td>${sponsorCell(t.sponsor)}<br><span class="section-hint">${t.task_type || ''}${t.owner ? ` · ${t.owner}` : ''}</span></td>\n      <td>${watchdogStatusBadge(t.status)}</td>\n      <td>${t.outstanding || t.note || '-'}</td>\n      <td>${t.what_i_did || ''}</td>\n      <td>${t.issues_next_steps || ''}</td>\n      <td>\n        ${t.source_task_url ? `<a class="sub-link" href="${t.source_task_url}" target="_blank" rel="noopener">Notion</a>` : ''}\n        ${t.sandbox_permalink ? ` · <a class="sub-link" href="${t.sandbox_permalink}" target="_blank" rel="noopener">Sandbox</a>` : ''}\n      </td>\n    </tr>\n  `)).join('');
+  const priorRuns = (state.watchdog.runs || []).slice(0, -1).reverse();
+  container.innerHTML = `\n    <table class="rev-tbl watchdog-tbl">\n      <thead><tr>\n        <th>Sponsor</th><th>Status</th><th>Outstanding</th><th>What I did</th><th>Issues / next steps</th><th>Links</th>\n      </tr></thead>\n      <tbody>${rows}</tbody>\n    </table>\n    ${priorRuns.length ? `\n      <details class="drafts-completed" style="margin-top: 20px;">\n        <summary>Prior runs (${priorRuns.length})</summary>\n        ${priorRuns.map((r => `\n          <div class="sub-block" style="margin-top: 10px;">\n            <div class="section-hint">${formatDate(r.started_at)} · ${(r.tasks || []).length} task(s)</div>\n            <table class="rev-tbl watchdog-tbl">\n              <thead><tr><th>Sponsor</th><th>Status</th><th>Outstanding</th><th>What I did</th><th>Issues / next steps</th></tr></thead>\n              <tbody>${(r.tasks || []).map((t => `\n                <tr>\n                  <td>${sponsorCell(t.sponsor)}</td>\n                  <td>${watchdogStatusBadge(t.status)}</td>\n                  <td>${t.outstanding || t.note || '-'}</td>\n                  <td>${t.what_i_did || ''}</td>\n                  <td>${t.issues_next_steps || ''}</td>\n                </tr>\n              `)).join('')}</tbody>\n            </table>\n          </div>\n        `)).join('')}\n      </details>\n    ` : ''}\n  `;
+}
+
 function escapeHtml(text) {
   if (text == null) return '';
   return String(text).replace(/[&<>"']/g, (c => ({
@@ -1148,9 +1617,9 @@ function renderSkillPeople() {
   const shared = rows.filter((r => Object.keys(r.edits).filter((k => k !== 'Automation')).length >= 3)).length;
   document.getElementById('spSub').textContent = `Who built each skill and who keeps working on it, from git history (updated ${skillPeople.meta.generated}). ` + 'Skill runs are not logged anywhere, so "uses most" is read as "edits most".';
   const card = (k, v, sub) => `<div class="pipe-card"><div class="pipe-k">${k}</div><div class="pipe-v">${v}</div><div class="pipe-sub">${sub}</div></div>`;
-  let h = `<div class="pipe-cards sp-cards">\n    ${card('Skills', rows.length, `${rows.filter((r => r.unattended)).length} run on a schedule, ${rows.filter((r => r.retired)).length} retired`)}\n    ${card('Edits to skills', total.toLocaleString(), `${rows.reduce(((s, r) => s + r.edits30d), 0)} in the last 30 days`)}\n    ${card('Most worked on', escapeHtml('/' + busiest.name), `${busiest.totalEdits} edits by ${Object.keys(busiest.edits).length} people`)}\n    ${card('Newest', escapeHtml('/' + newest.name), `${fmtD(newest.created)} by ${escapeHtml(newest.creator || '?')}`)}\n    ${card('Shared skills', shared, 'edited by 3 or more people')}\n    ${card('Untouched 60+ days', stale, 'not retired, no edit since')}\n  </div>`;
-  h += `<div class="pipe-cards sp-cards">${people.map((p => `<div class="pipe-card sp-person">\n      <div class="sp-who"><span class="sp-avatar">${escapeHtml(p.n[0])}</span>${escapeHtml(p.n)}</div>\n      <dl class="sp-dl">\n        <dt>Created</dt><dd>${p.created.length}</dd>\n        <dt>Main editor of</dt><dd>${p.top.length}</dd>\n        <dt>Skill edits</dt><dd>${p.edits} <span class="sp-dim">(${Math.round(p.edits / total * 100)}%)</span></dd>\n        <dt>Last to edit, past 30d</dt><dd>${p.recent}</dd>\n      </dl>\n      ${p.newest ? `<div class="pipe-sub">Newest: /${escapeHtml(p.newest.name)} · ${fmtD(p.newest.created)}</div>` : ''}\n    </div>`)).join('')}</div>`;
-  h += `<div class="pipe-chart sp-map-wrap">\n    <div class="sp-map-head"><h3>The skill map</h3>\n      <p class="pipe-chart-note">Each skill floats toward everyone who edits it, so shared skills sit between people. Bigger = longer skill file. Thicker ring = more edits. Colour = main editor. Hover for details, click to open.</p></div>\n    <div class="sp-map" id="spMap"></div>\n  </div>`;
+  let h = `<div class="pipe-cards sp-cards">\n    ${card('Skills', rows.length, `${rows.filter((r => r.unattended)).length} run on a schedule, ${rows.filter((r => r.retired)).length} retired`)}\n    ${card('Edits to skills', total.toLocaleString(), `${rows.reduce(((s, r) => s + r.edits30d), 0)} in the last 30 days`)}\n    ${card('Most worked on', `<span class="blur-txt">${escapeHtml('/' + busiest.name)}</span>`, `${busiest.totalEdits} edits by ${Object.keys(busiest.edits).length} people`)}\n    ${card('Newest', `<span class="blur-txt">${escapeHtml('/' + newest.name)}</span>`, `${fmtD(newest.created)} by ${escapeHtml(newest.creator || '?')}`)}\n    ${card('Shared skills', shared, 'edited by 3 or more people')}\n    ${card('Untouched 60+ days', stale, 'not retired, no edit since')}\n  </div>`;
+  h += `<div class="pipe-cards sp-cards">${people.map((p => `<div class="pipe-card sp-person">\n      <div class="sp-who"><span class="sp-avatar">${escapeHtml(p.n[0])}</span>${escapeHtml(p.n)}</div>\n      <dl class="sp-dl">\n        <dt>Created</dt><dd>${p.created.length}</dd>\n        <dt>Main editor of</dt><dd>${p.top.length}</dd>\n        <dt>Skill edits</dt><dd>${p.edits} <span class="sp-dim">(${Math.round(p.edits / total * 100)}%)</span></dd>\n        <dt>Last to edit, past 30d</dt><dd>${p.recent}</dd>\n      </dl>\n      ${p.newest ? `<div class="pipe-sub">Newest: <span class="blur-txt">/${escapeHtml(p.newest.name)}</span> · ${fmtD(p.newest.created)}</div>` : ''}\n    </div>`)).join('')}</div>`;
+  h += `<div class="pipe-chart sp-map-wrap">\n    <div class="sp-map-head"><h3>The skill map</h3>\n      <p class="pipe-chart-note">Each skill floats toward everyone who edits it, so shared skills sit between people. Bigger = longer skill file. Thicker ring = more edits. Colour = main editor. Hover for details. Skill names are hidden in the demo.</p></div>\n    <div class="sp-map" id="spMap"></div>\n  </div>`;
   box.innerHTML = h;
   spDrawMap(rows, people.map((p => p.n)).filter((n => n !== 'Automation')), fmtD, daysAgo);
 }
@@ -1250,7 +1719,7 @@ function spDrawMap(rows, names, fmtD, daysAgo) {
   svg += `</defs><g id="spLinks"></g>`;
   nodes.forEach(((n, i) => {
     const showLabel = n.rad >= 13;
-    svg += `<g class="sp-node" data-i="${i}" transform="translate(${n.x.toFixed(1)},${n.y.toFixed(1)})">\n      <circle r="${n.rad.toFixed(1)}" style="fill:color-mix(in srgb, ${n.color} 22%, var(--bg-card));stroke:${n.color};stroke-width:${n.ring.toFixed(1)}"/>\n      ${n.r.unattended ? `<circle r="${(n.rad * .28).toFixed(1)}" style="fill:${n.color}"/>` : ''}\n      <text y="${(n.rad + n.ring / 2 + 12).toFixed(1)}" text-anchor="middle" class="sp-lbl${showLabel ? '' : ' sp-lbl-hide'}${n.r.retired ? ' sp-lbl-retired' : ''}">/${esc(n.r.name)}</text></g>`;
+    svg += `<g class="sp-node" data-i="${i}" transform="translate(${n.x.toFixed(1)},${n.y.toFixed(1)})">\n      <circle r="${n.rad.toFixed(1)}" style="fill:color-mix(in srgb, ${n.color} 22%, var(--bg-card));stroke:${n.color};stroke-width:${n.ring.toFixed(1)}"/>\n      ${n.r.unattended ? `<circle r="${(n.rad * .28).toFixed(1)}" style="fill:${n.color}"/>` : ''}\n      <text y="${(n.rad + n.ring / 2 + 12).toFixed(1)}" text-anchor="middle" class="sp-lbl blur-txt${showLabel ? '' : ' sp-lbl-hide'}${n.r.retired ? ' sp-lbl-retired' : ''}">/${esc(n.r.name)}</text></g>`;
   }));
   for (const n of names) {
     const a = anchors[n];
@@ -1267,7 +1736,7 @@ function spDrawMap(rows, names, fmtD, daysAgo) {
     const editors = Object.entries(r.edits).sort(((a, b) => b[1] - a[1]));
     links.innerHTML = editors.filter((([p]) => anchors[p])).map((([p, v]) => `<line x1="${anchors[p].x}" y1="${anchors[p].y}" x2="${(n.cx ?? n.x).toFixed(1)}" y2="${(n.cy ?? n.y).toFixed(1)}" style="stroke:${anchors[p].color};stroke-width:${1 + 3 * v / r.totalEdits};opacity:.55"/>`)).join('');
     const age = daysAgo(r.lastEdited);
-    tip.innerHTML = `<div class="rev-tip-h">/${esc(r.name)}${r.unattended ? ' <span class="sp-badge">Scheduled</span>' : ''}${r.retired ? ' <span class="sp-badge sp-retired">Retired</span>' : ''}</div>\n      ${r.desc ? `<div class="sp-tip-desc">${esc(r.desc.length > 140 ? r.desc.slice(0, 140) + '…' : r.desc)}</div>` : ''}\n      <div class="rev-tip-row"><span>Created</span><b>${fmtD(r.created)} by ${esc(r.creator || '?')}</b></div>\n      <div class="rev-tip-row"><span>Edits</span><b>${r.totalEdits} total, ${r.edits30d} in 30d</b></div>\n      ${editors.map((([p, v]) => `<div class="rev-tip-row"><span><i style="background:${anchors[p]?.color || 'var(--text-dim)'}"></i>${esc(p)}</span><b>${v} (${Math.round(v / r.totalEdits * 100)}%)</b></div>`)).join('')}\n      <div class="rev-tip-row"><span>Last edit</span><b>${age === null ? '-' : age === 0 ? 'today' : age + 'd ago'} by ${esc(r.lastEditor || '?')}</b></div>\n      <div class="rev-tip-row"><span>Size</span><b>${r.lines} lines${r.files > 1 ? `, ${r.files} files` : ''}</b></div>`;
+    tip.innerHTML = `<div class="rev-tip-h"><span class="blur-txt">/${esc(r.name)}</span>${r.unattended ? ' <span class="sp-badge">Scheduled</span>' : ''}${r.retired ? ' <span class="sp-badge sp-retired">Retired</span>' : ''}</div>\n      ${r.desc ? `<div class="sp-tip-desc blur-txt">${esc(r.desc.length > 140 ? r.desc.slice(0, 140) + '…' : r.desc)}</div>` : ''}\n      <div class="rev-tip-row"><span>Created</span><b>${fmtD(r.created)} by ${esc(r.creator || '?')}</b></div>\n      <div class="rev-tip-row"><span>Edits</span><b>${r.totalEdits} total, ${r.edits30d} in 30d</b></div>\n      ${editors.map((([p, v]) => `<div class="rev-tip-row"><span><i style="background:${anchors[p]?.color || 'var(--text-dim)'}"></i>${esc(p)}</span><b>${v} (${Math.round(v / r.totalEdits * 100)}%)</b></div>`)).join('')}\n      <div class="rev-tip-row"><span>Last edit</span><b>${age === null ? '-' : age === 0 ? 'today' : age + 'd ago'} by ${esc(r.lastEditor || '?')}</b></div>\n      <div class="rev-tip-row"><span>Size</span><b>${r.lines} lines${r.files > 1 ? `, ${r.files} files` : ''}</b></div>`;
     tip.style.display = 'block';
     move(ev);
   };
@@ -1288,7 +1757,6 @@ function spDrawMap(rows, names, fmtD, daysAgo) {
     g.addEventListener('mouseenter', (ev => show(i, ev)));
     g.addEventListener('mousemove', move);
     g.addEventListener('mouseleave', hide);
-    g.addEventListener('click', (() => openDrawer(nodes[i].r.id)));
   }));
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const panel = document.getElementById('panel-skillpeople');
@@ -1319,6 +1787,12 @@ function formatDate(iso) {
     month: 'short',
     year: '2-digit'
   });
+}
+
+function formatSize(bytes) {
+  if (bytes < 1024) return `${bytes}B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)}KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
 }
 
 const PULSE = {
@@ -1392,6 +1866,64 @@ function initPulse() {
   if (!PULSE.loaded) return fetchPulse(false);
 }
 
+const SHIP = {
+  data: null
+};
+
+async function fetchShipping() {
+  state.shippingLoaded = true;
+  try {
+    const d = await (await fetch('/api/contributors')).json();
+    if (d.error) throw new Error(d.error);
+    shipRender(d);
+  } catch (e) {
+    state.shippingLoaded = false;
+    document.getElementById('shipSub').innerHTML = `<span style="color:var(--stale)">Could not load /api/contributors - ${escapeHtml(e.message)}</span>`;
+  }
+}
+
+function shipRender(d) {
+  SHIP.data = d;
+  const all = d.contributors || [];
+  const humans = all.filter((c => !c.isBot));
+  const bots = all.filter((c => c.isBot));
+  document.getElementById('shipCount').textContent = humans.length;
+  const totalHuman = humans.reduce(((s, c) => s + c.commits), 0);
+  const totalBot = bots.reduce(((s, c) => s + c.commits), 0);
+  const top = humans[0];
+  document.getElementById('shipCards').innerHTML = [ [ 'Commits, last 12 months', String(d.meta.totalCommits), `${humans.length} people plus automation` ], [ 'Top shipper', top ? top.name : '-', top ? `${top.commits} commits` : '' ], [ 'Shipped in last 30d', String(all.reduce(((s, c) => s + c.commits30d), 0)), 'across everyone' ], [ 'Via automation', totalHuman + totalBot ? Math.round(totalBot / (totalHuman + totalBot) * 100) + '%' : '0%', 'commits authored by Claude or bots' ] ].map((c => `<div class="pipe-card"><div class="pipe-k">${c[0]}</div><div class="pipe-v">${escapeHtml(c[1])}</div><div class="pipe-sub">${escapeHtml(c[2])}</div></div>`)).join('');
+  const block = (title, note, body) => `<div class="pipe-chart"><h3>${title}</h3><p class="pipe-chart-note">${note}</p>${body}</div>`;
+  document.getElementById('shipCharts').innerHTML = block('Commits, last 12 months', 'Everyone who has landed work on main. Automation is marked rather than hidden.', shipBars(all, 'commits')) + block('Last 30 days', 'Who is actually shipping right now, which is a different list.', shipBars([ ...all ].sort(((a, b) => b.commits30d - a.commits30d)), 'commits30d')) + block('Lines changed', 'Volume of code moved. A big number here is not automatically a better one.', shipLines(all)) + block('Days active', 'How many separate days each person landed something. Consistency rather than bursts.', shipBars([ ...all ].sort(((a, b) => b.activeDays - a.activeDays)), 'activeDays'));
+  pipeBindTips();
+}
+
+function shipBars(rows, key) {
+  rows = rows.filter((r => r[key] > 0));
+  if (!rows.length) return '<div class="pipe-empty">Nothing in this window.</div>';
+  const W = 560, rowH = 26, gap = 7, padL = 150, padR = 54;
+  const H = rows.length * (rowH + gap);
+  const mx = Math.max(1, ...rows.map((r => r[key])));
+  let s = '';
+  rows.forEach(((r, i) => {
+    const y = i * (rowH + gap), w = Math.max(2, r[key] / mx * (W - padL - padR));
+    const col = r.isBot ? 'var(--text-dim)' : 'var(--brand-purple)';
+    const nm = r.name;
+    const tip = `<div class="rev-tip-h">${pipeAttr(nm)}${r.isBot ? ' (automation)' : ''}</div>` + `<div class="rev-tip-row"><span>Commits, 12mo</span><b>${r.commits}</b></div>` + `<div class="rev-tip-row"><span>Last 90d</span><b>${r.commits90d}</b></div>` + `<div class="rev-tip-row"><span>Last 30d</span><b>${r.commits30d}</b></div>` + `<div class="rev-tip-row"><span>Days active</span><b>${r.activeDays}</b></div>`;
+    s += `<text x="${padL - 8}" y="${y + rowH / 2 + 4}" text-anchor="end" class="pv-lbl">${pipeAttr(nm)}</text>`;
+    s += pipeRightRect(padL, y, w, rowH, 4, col, `data-tip="${pipeAttr(tip)}"`);
+    s += `<text x="${padL + w + 8}" y="${y + rowH / 2 + 4}" class="pv-val">${r[key]}</text>`;
+  }));
+  return `<svg viewBox="0 0 ${W} ${H}">${s}</svg>`;
+}
+
+function shipLines(rows) {
+  rows = [ ...rows ].sort(((a, b) => b.added + b.removed - (a.added + a.removed))).filter((r => r.added + r.removed > 0));
+  return `<div class="pipe-fc-tbl">` + rows.map((r => {
+    const nm = r.name;
+    return `<div class="pipe-fc-row"><span class="pipe-fc-stage">${escapeHtml(nm)}${r.isBot ? ' <span class="pv-dim">automation</span>' : ''}</span>` + `<span class="pipe-fc-math">+${r.added.toLocaleString()} / -${r.removed.toLocaleString()}</span>` + `<b>${(r.added + r.removed).toLocaleString()}</b></div>`;
+  })).join('') + `</div>`;
+}
+
 const BOOK = {
   entries: []
 };
@@ -1413,13 +1945,15 @@ const bookAddDays = (d, n) => {
 };
 
 async function fetchBookings() {
+  state.bookingsLoaded = true;
   try {
     const r = await fetch('/api/bookings');
     const d = await r.json();
     if (d.error) throw new Error(d.error);
     bookRender(d);
   } catch (e) {
-    console.warn(e);
+    state.bookingsLoaded = false;
+    document.getElementById('bookSub').innerHTML = `<span style="color:var(--stale)">Could not load /api/bookings - ${escapeHtml(e.message)}</span>`;
   }
 }
 
@@ -1429,6 +1963,115 @@ function bookSum(entries, fromISO, toISO) {
 
 function bookRender(data) {
   BOOK.entries = data.entries || [];
+  const e = BOOK.entries;
+  const today = bookToday(), tISO = bookISO(today);
+  const back = n => bookISO(bookAddDays(today, -n));
+  const fwd = n => bookISO(bookAddDays(today, n));
+  const tomorrow = fwd(1);
+  document.getElementById('bookCount').textContent = e.length;
+  const m = data.meta || {};
+  document.getElementById('bookSub').textContent = `Bookings x Deliverables - ${m.matched} priced deliverables - pulled ${m.pulled}` + (m.skippedUnlinked || m.skippedUndated ? ` - ${(m.skippedUnlinked || 0) + (m.skippedUndated || 0)} rows skipped (no date or no link)` : '');
+  const futureTotal = e.filter((x => x.date > tISO)).reduce(((s, x) => s + x.amount), 0);
+  const cards = [ [ 'Delivered - last 90d', fmtMoney(bookSum(e, back(89), tISO)), 'recognised revenue' ], [ 'Booked - next 30d', fmtMoney(bookSum(e, tomorrow, fwd(30))), 'already confirmed' ], [ 'Booked - next 90d', fmtMoney(bookSum(e, tomorrow, fwd(90))), 'already confirmed' ], [ 'All future booked', fmtMoney(futureTotal), e.filter((x => x.date > tISO)).length + ' deliverables' ] ];
+  document.getElementById('bookCards').innerHTML = cards.map((c => `<div class="pipe-card"><div class="pipe-k">${c[0]}</div><div class="pipe-v">${c[1]}</div><div class="pipe-sub">${c[2]}</div></div>`)).join('');
+  const block = (title, note, body, foot = '') => `<div class="pipe-chart"><h3>${title}</h3><p class="pipe-chart-note">${note}</p>${body}${foot}</div>`;
+  document.getElementById('bookCharts').innerHTML = block('Delivered and booked', 'Revenue behind you on the left, revenue already committed ahead of you on the right. Today counts as delivered.', bkWindows(e, back, fwd, tISO, tomorrow)) + block('Cumulative booked revenue', 'Starts at zero today and only climbs. Read the end of the line for everything on the books.', bkCumulative(e, today, tISO)) + block('Trailing 90 day averages', 'What the last 90 days actually delivered, and the run rate that implies.', bkAverages(e, back, tISO)) + block('Booked revenue by month', 'Where the committed money lands. Past months are delivered, future months are booked.', bkByMonth(e, tISO));
+  pipeBindTips();
+}
+
+function bkWindows(e, back, fwd, tISO, tomorrow) {
+  const rows = [ [ 'Last 12 months', bookSum(e, back(364), tISO), 'past' ], [ 'Last 90 days', bookSum(e, back(89), tISO), 'past' ], [ 'Last 30 days', bookSum(e, back(29), tISO), 'past' ], [ 'Last 7 days', bookSum(e, back(6), tISO), 'past' ], [ 'Next 30 days', bookSum(e, tomorrow, fwd(30)), 'future' ], [ 'Next 90 days', bookSum(e, tomorrow, fwd(90)), 'future' ], [ 'All future', e.filter((x => x.date > tISO)).reduce(((s, x) => s + x.amount), 0), 'future' ] ];
+  const W = 560, rowH = 26, gap = 7, padL = 118, padR = 64;
+  const H = rows.length * (rowH + gap);
+  const mx = Math.max(1, ...rows.map((r => r[1])));
+  let s = '';
+  rows.forEach(((r, i) => {
+    const y = i * (rowH + gap), w = Math.max(2, r[1] / mx * (W - padL - padR));
+    const col = r[2] === 'past' ? 'var(--brand-purple)' : 'var(--brand-orange)';
+    const tip = `<div class="rev-tip-h">${pipeAttr(r[0])}</div><div class="rev-tip-row"><span>${r[2] === 'past' ? 'Delivered' : 'Booked'}</span><b>${fmtMoney(r[1])}</b></div>`;
+    s += `<text x="${padL - 8}" y="${y + rowH / 2 + 4}" text-anchor="end" class="pv-lbl">${pipeAttr(r[0])}</text>`;
+    s += pipeRightRect(padL, y, w, rowH, 4, col, `data-tip="${pipeAttr(tip)}"`);
+    s += `<text x="${padL + w + 8}" y="${y + rowH / 2 + 4}" class="pv-val">${pipeK(r[1])}</text>`;
+  }));
+  return `<svg viewBox="0 0 ${W} ${H}">${s}</svg>\n    <div class="pipe-legend"><span><i class="pipe-sw" style="background:var(--brand-purple)"></i>Delivered</span><span><i class="pipe-sw" style="background:var(--brand-orange)"></i>Booked ahead</span></div>`;
+}
+
+function bkCumulative(e, today, tISO) {
+  const future = e.filter((x => x.date > tISO)).sort(((a, b) => a.date.localeCompare(b.date)));
+  if (!future.length) return '<div class="pipe-empty">Nothing booked beyond today.</div>';
+  const lastDay = Math.round((new Date(future[future.length - 1].date) - today) / dayMs);
+  const span = Math.max(lastDay, 30);
+  const pts = [ {
+    d: 0,
+    v: 0
+  } ];
+  let run = 0;
+  for (const x of future) {
+    run += x.amount;
+    pts.push({
+      d: Math.round((new Date(x.date) - today) / dayMs),
+      v: run
+    });
+  }
+  const W = 560, H = 260, padL = 64, padR = 22, padT = 18, padB = 40;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  const X = d => padL + d / span * plotW, Y = v => padT + plotH - v / run * plotH;
+  let s = '';
+  for (let g = 0; g <= 4; g++) {
+    const yy = padT + plotH - plotH * g / 4;
+    s += `<line x1="${padL}" y1="${yy}" x2="${W - padR}" y2="${yy}" stroke="var(--border)"/>` + `<text x="${padL - 8}" y="${yy + 3}" text-anchor="end" class="pv-dim">${pipeK(run * g / 4)}</text>`;
+  }
+  let area = `${X(0)},${padT + plotH} `, line = '';
+  pts.forEach((p => {
+    area += `${X(p.d).toFixed(1)},${Y(p.v).toFixed(1)} `;
+    line += `${X(p.d).toFixed(1)},${Y(p.v).toFixed(1)} `;
+  }));
+  area += `${X(pts[pts.length - 1].d).toFixed(1)},${padT + plotH}`;
+  s += `<polygon points="${area}" fill="var(--brand-orange)" opacity=".13"/>`;
+  s += `<polyline points="${line.trim()}" fill="none" stroke="var(--brand-orange)" stroke-width="2.5" stroke-linejoin="round"/>`;
+  for (let d = 30; d <= span; d += 30) {
+    const upto = pts.filter((p => p.d <= d)).pop() || {
+      v: 0
+    };
+    s += `<line x1="${X(d).toFixed(1)}" y1="${padT}" x2="${X(d).toFixed(1)}" y2="${padT + plotH}" stroke="var(--border-hover)" stroke-dasharray="3 3"/>`;
+    const tip = `<div class="rev-tip-h">Day ${d}</div><div class="rev-tip-row"><span>Booked by then</span><b>${fmtMoney(upto.v)}</b></div>`;
+    s += `<circle cx="${X(d).toFixed(1)}" cy="${Y(upto.v).toFixed(1)}" r="5" fill="var(--brand-orange)" stroke="var(--bg-card)" stroke-width="2" data-tip="${pipeAttr(tip)}"/>`;
+    s += `<text x="${X(d).toFixed(1)}" y="${H - padB + 16}" text-anchor="middle" class="pv-dim">+${d}d</text>`;
+  }
+  s += `<text x="${X(0)}" y="${H - padB + 16}" text-anchor="middle" class="pv-dim">today</text>`;
+  s += `<text x="${W - padR}" y="${Y(run) - 10}" text-anchor="end" class="pv-val">${fmtMoney(run)}</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}">${s}</svg>\n    <p class="pipe-chart-foot">Everything on the books runs out ${span} days from today, totalling ${fmtMoney(run)}.</p>`;
+}
+
+function bkAverages(e, back, tISO) {
+  const total90 = bookSum(e, back(89), tISO);
+  const rows = [ [ 'Last 90 days, total', total90, 'actual' ], [ '30 day average', total90 / 3, 'across those 90 days' ], [ '7 day average', total90 / (90 / 7), 'across those 90 days' ], [ 'Per day average', total90 / 90, 'across those 90 days' ] ];
+  return `<div class="pipe-fc-tbl">` + rows.map((r => `<div class="pipe-fc-row"><span class="pipe-fc-stage">${r[0]}</span><span class="pipe-fc-math">${r[2]}</span><b>${fmtMoney(r[1])}</b></div>`)).join('') + `</div>\n  <p class="pipe-chart-foot">Averages are the 90 day total spread evenly, so they read as run rate rather than any single period's takings.</p>`;
+}
+
+function bkByMonth(e, tISO) {
+  const MON = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ];
+  const map = new Map;
+  e.forEach((x => {
+    const k = x.date.slice(0, 7);
+    map.set(k, (map.get(k) || 0) + x.amount);
+  }));
+  const keys = [ ...map.keys() ].sort().slice(-14);
+  if (!keys.length) return '<div class="pipe-empty">No dated revenue.</div>';
+  const W = 560, H = 230, padT = 22, padB = 34, plotH = H - padT - padB;
+  const mx = Math.max(1, ...keys.map((k => map.get(k))));
+  const slot = W / keys.length, bw = Math.min(38, slot - 10);
+  let s = `<line x1="0" y1="${H - padB}" x2="${W}" y2="${H - padB}" stroke="var(--border)"/>`;
+  keys.forEach(((k, i) => {
+    const v = map.get(k), cx = slot * i + slot / 2, h = Math.max(2, v / mx * plotH), y = H - padB - h;
+    const future = k >= tISO.slice(0, 7);
+    const col = future ? 'var(--brand-orange)' : 'var(--brand-purple)';
+    const [yy, mm] = k.split('-');
+    const tip = `<div class="rev-tip-h">${MON[+mm - 1]} ${yy}</div><div class="rev-tip-row"><span>${future ? 'Booked' : 'Delivered'}</span><b>${fmtMoney(v)}</b></div>`;
+    s += pipeTopRect(cx - bw / 2, y, bw, h, 4, col, `data-tip="${pipeAttr(tip)}"`);
+    s += `<text x="${cx}" y="${H - padB + 15}" text-anchor="middle" class="pv-dim">${MON[+mm - 1]}</text>`;
+  }));
+  return `<svg viewBox="0 0 ${W} ${H}">${s}</svg>`;
 }
 
 function skillChip(cmd) {
@@ -2369,7 +3012,7 @@ function subInit(d) {
       year: '2-digit'
     });
     const title = escapeHtml((p.title || '').slice(0, 56));
-    const link = p.url ? `<a href="${escapeHtml(p.url)}" target="_blank" rel="noopener" class="sub-link">${title}</a>` : title;
+    const link = p.url ? `<a href="${escapeHtml(p.url)}" target="_blank" rel="noopener" class="sub-link blur-txt">${title}</a>` : `<span class="blur-txt">${title}</span>`;
     return `<tr><td>${ds}</td><td>${link}</td><td>${subN(p.recipients)}</td><td>${p.openRate != null ? p.openRate.toFixed(1) + '%' : '-'}</td><td>${p.clickRate != null ? p.clickRate.toFixed(1) + '%' : '-'}</td></tr>`;
   })).join('');
   const sw = document.getElementById('subSwitch');
@@ -2484,6 +3127,7 @@ function subEnsureTip() {
   if (SUBS.tip) return;
   SUBS.tip = document.createElement('div');
   SUBS.tip.className = 'rev-tip';
+  SUBS.tip.dataset.spoil = 'all';
   SUBS.tip.style.display = 'none';
   SUBS.guide = document.createElement('div');
   SUBS.guide.className = 'rev-guide';
@@ -2702,18 +3346,64 @@ function calMonday(d) {
 }
 
 async function fetchCalendar() {
+  state.calendarLoaded = true;
   try {
     const r = await fetch('/api/calendar');
     const d = await r.json();
     if (d.error) throw new Error(d.error);
     calRender(d);
   } catch (e) {
-    console.warn(e);
+    state.calendarLoaded = false;
+    document.getElementById('calSub').innerHTML = `<span style="color:var(--stale)">Could not load /api/calendar - ${escapeHtml(e.message)}</span>`;
   }
 }
 
 function calRender(d) {
   CAL.data = d;
+  const typeColor = Object.fromEntries(d.meta.types.map((t => [ t.key, t.color ])));
+  const typeShort = Object.fromEntries(d.meta.types.map((t => [ t.key, t.short ])));
+  const statusColor = Object.fromEntries(d.meta.statuses.map((s => [ s.key, s.color ])));
+  const MON = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ];
+  const DOW = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ];
+  const now = new Date;
+  now.setHours(0, 0, 0, 0);
+  const todayMs = now.getTime();
+  const items = d.items.map((it => {
+    const dt = new Date(it.date + 'T00:00:00');
+    const sponsor = it.name.split(' - ')[0];
+    return {
+      ...it,
+      dt: dt,
+      ms: dt.getTime(),
+      sponsor: sponsor,
+      deliv: it.name.slice(sponsor.length + 3)
+    };
+  })).sort(((a, b) => a.ms - b.ms));
+  const thisWeekStart = calMonday(now).getTime(), thisWeekEnd = thisWeekStart + 7 * 864e5;
+  const thisWeek = items.filter((it => it.ms >= thisWeekStart && it.ms < thisWeekEnd)).length;
+  const next30 = items.filter((it => it.ms >= todayMs && it.ms < todayMs + 30 * 864e5)).length;
+  const needsPrep = items.filter((it => (it.status === 'Not started' || it.status === 'Rough Draft') && it.ms >= todayMs && it.ms < todayMs + 21 * 864e5)).length;
+  const sponsors = new Set(items.filter((it => it.ms >= todayMs)).map((it => it.sponsor)));
+  document.getElementById('calCount').textContent = items.length;
+  document.getElementById('calSub').innerHTML = `${d.meta.source} · pulled ${d.meta.pulled} · <a class="sub-link" href="${d.meta.url}" target="_blank" rel="noopener">open in Notion</a>`;
+  const card = (k, v, s) => `<div class="cal-card"><div class="cal-k">${k}</div><div class="cal-v">${v}</div><div class="cal-cardsub">${s}</div></div>`;
+  document.getElementById('calCards').innerHTML = [ card('This week', thisWeek, 'deliverables shipping'), card('Next 30 days', next30, 'scheduled'), card('Needs prep', needsPrep, 'not started / rough · ≤21d'), card('Active sponsors', sponsors.size, 'with upcoming items') ].join('');
+  document.getElementById('calLegend').innerHTML = d.meta.types.map((t => `<span><i class="cal-sw" style="background:${t.color}"></i>${t.short}</span>`)).join('');
+  const weeks = new Map;
+  items.forEach((it => {
+    const wk = calMonday(it.dt).getTime();
+    if (!weeks.has(wk)) weeks.set(wk, []);
+    weeks.get(wk).push(it);
+  }));
+  let html = '';
+  [ ...weeks.keys() ].sort(((a, b) => a - b)).forEach((wk => {
+    const ws = new Date(wk), list = weeks.get(wk), isCurrent = wk === thisWeekStart;
+    html += `<div class="cal-week ${isCurrent ? 'current' : ''}">\n      <div class="cal-week-head">Week of ${MON[ws.getMonth()]} ${ws.getDate()}${isCurrent ? '<span class="cal-now">this week</span>' : ''}<span class="cal-week-count">${list.length}</span></div>\n      <div class="cal-week-body">${list.map((it => {
+      const past = it.ms < todayMs, tc = typeColor[it.type] || '#7A7A88', sc = statusColor[it.status] || '#7A7A88';
+      return `<div class="cal-item ${past ? 'past' : ''}">\n          <div class="cal-date"><span class="cal-dow">${DOW[it.dt.getDay()]}</span><span class="cal-dd">${it.dt.getDate()}</span></div>\n          <span class="cal-type" style="background:${tc}1f;color:${tc};border-color:${tc}55">${escapeHtml(typeShort[it.type] || it.type)}</span>\n          <div class="cal-main">${sponsorLogo(it.sponsor, 16)}<span class="cal-sponsor">${escapeHtml(it.sponsor)}</span> <span class="cal-deliv">${escapeHtml(it.deliv)}</span></div>\n          <span class="cal-status"><i style="background:${sc}"></i>${escapeHtml(it.status)}</span>\n        </div>`;
+    })).join('')}</div>\n    </div>`;
+  }));
+  document.getElementById('calAgenda').innerHTML = html;
 }
 
 init();

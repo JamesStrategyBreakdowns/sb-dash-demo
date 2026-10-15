@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Social Performance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FFFAF3; --ink:#232222; --muted:#98907f; --line:#efe6d6; --card:#ffffff;
+    --purple:#B19EF8; --purple-deep:#6d5bd0; --purple-soft:rgba(177,158,248,.18);
+    --orange:#FC6932; --yellow:#FFE7C6; --blue:#3843EB;
+    --li:#0A66C2; --li-soft:rgba(10,102,194,.09);
+    --x:#111111; --x-soft:rgba(17,17,17,.05);
+    --green:#2f9e6f;
+  }
+  body.dark{
+    --cream:#1A1A1F; --ink:#FFFAF3; --muted:#9E9EA8; --line:#33333f; --card:#222228;
+    --purple-soft:rgba(177,158,248,.18); --purple-deep:#cdbcff;
+    --li:#4A9EFF; --li-soft:rgba(74,158,255,.14); --x:#111111; --x-soft:rgba(255,255,255,.07);
+    --yellow:#3a2f1c; --green:#4ADE80;
+  }
+  body.embed{padding:16px 20px 40px}
+  body.embed > h1, body.embed > .sub{display:none}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cream);color:var(--ink);padding:34px 30px 70px;
+    font:15px/1.5 "Inter",-apple-system,BlinkMacSystemFont,sans-serif}
+  a{color:inherit}
+  h1{font-family:"Poppins",sans-serif;font-weight:700;font-size:24px;margin:0 0 4px;display:flex;align-items:center;gap:10px}
+  .sub{color:var(--muted);margin:0 0 26px;font-size:14px;max-width:720px}
+  .sub a{color:var(--purple-deep);font-weight:600;text-decoration:none}
+  .badge{font:600 11px "Poppins";color:var(--orange);background:var(--yellow);padding:3px 9px;border-radius:999px}
+  h2.sec{font-family:"Poppins";font-weight:600;font-size:16px;margin:32px 0 14px;
+    display:flex;align-items:baseline;gap:9px;border-bottom:1px solid var(--line);padding-bottom:8px}
+  h2.sec span{font-family:"Inter";font-weight:500;font-size:12.5px;color:var(--muted)}
+
+  
+  .winner{background:linear-gradient(135deg,var(--purple-soft),var(--card) 70%);
+    border:1px solid rgba(177,158,248,.55);border-radius:18px;padding:16px 22px 17px;margin:0 0 8px;
+    box-shadow:0 4px 16px rgba(109,91,208,.10)}
+  .winner .wtag{font:700 12px "Poppins";color:var(--purple-deep);display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .winner .wtag .p{background:var(--purple-deep);color:#fff;font-size:10px;padding:2px 8px;border-radius:999px;font-weight:600}
+  .winner .wname{font-family:"Poppins";font-weight:700;font-size:20px}
+  .winner .wmeta{font-size:12.5px;color:var(--muted)}
+  .winner .wstats{display:flex;gap:20px;flex-wrap:wrap;align-items:baseline;margin-top:9px;font-size:12.5px;color:var(--muted)}
+  .winner .wstats b{font-family:"Poppins";font-size:17px;color:var(--ink);margin-right:3px}
+  .winner .wlink{margin-left:auto;font-weight:600;text-decoration:none;color:var(--li);font-size:12.5px}
+
+  
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;box-shadow:0 2px 10px rgba(80,50,10,.04)}
+  .tbl{width:100%;border-collapse:collapse;background:var(--card);font-size:13px;min-width:720px}
+  .tbl th,.tbl td{padding:9px 10px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
+  .tbl thead th{font:600 10.5px "Poppins";color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+  .tbl thead tr.grp th{border-bottom:1px solid var(--line)}
+  .tbl thead tr.sub th{font-size:11px;padding:5px 10px;color:var(--muted)}
+  .tbl .col-post{text-align:left}
+  .tbl td.col-post{max-width:230px;white-space:normal}
+  .tbl tbody tr:last-child td{border-bottom:none}
+  .tbl tbody tr:hover{background:var(--li-soft)}
+  .tbl .day{color:var(--muted);font-size:12px}
+  .pname{font-weight:600}
+  .fmt{display:inline-block;font:600 10px "Inter";padding:2px 8px;border-radius:999px;background:var(--purple-soft);color:var(--purple-deep);white-space:nowrap}
+  .tbl td.typecol{white-space:nowrap}
+  .plinks{display:block;margin-top:3px}
+  .plinks a{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:5px;color:#fff;font-size:9px;font-weight:800;margin-right:5px;text-decoration:none}
+  .plinks a.li{background:var(--li)} .plinks a.x{background:var(--x)}
+  .tbl td.xcol{color:var(--muted)}
+  .tbl td.fol{font-weight:700;color:var(--green)}
+  .tbl .big{font-weight:700}
+
+  
+  .strip{display:flex;gap:14px;flex-wrap:wrap;margin:0 0 16px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 18px;min-width:130px;box-shadow:0 2px 10px rgba(80,50,10,.04)}
+  .kpi .n{font-family:"Poppins";font-weight:700;font-size:22px;line-height:1.1}
+  .kpi .l{font-size:11.5px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.03em}
+
+  
+  .charts{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .chart-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px 18px;box-shadow:0 2px 10px rgba(80,50,10,.04)}
+  .chart-card.wide{grid-column:1 / -1}
+  .chart-card h3{font-family:"Poppins";font-weight:600;font-size:14px;margin:0 0 2px}
+  .chart-note{font-size:11.5px;color:var(--muted);margin:0 0 14px}
+  .bc-row{display:grid;grid-template-columns:130px 1fr auto;align-items:center;gap:10px;margin-bottom:10px}
+  .bc-row:last-child{margin-bottom:0}
+  .bc-label{font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .bc-track{height:16px;background:var(--li-soft);border-radius:999px;overflow:hidden}
+  .bc-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--purple),var(--orange))}
+  .bc-val{font-family:"Poppins";font-weight:600;font-size:12.5px;min-width:52px;text-align:right}
+  .bc-val .bc-sub{display:block;font-family:"Inter";font-weight:400;font-size:10px;color:var(--muted)}
+
+  .insights{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:6px 20px;margin-top:16px;box-shadow:0 2px 10px rgba(80,50,10,.04)}
+  .ins{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--line);align-items:flex-start}
+  .insights .ins:last-child{border-bottom:none}
+  .ins .ic{font-size:16px;line-height:1.3}
+  .ins .tx{font-size:13px}
+  .ins .tx b{color:var(--green)}
+  .ins .tx .dim{color:var(--muted)}
+
+  .foot-note{color:var(--muted);font-size:12px;margin-top:22px}
+  .empty-state{background:var(--card);border:1px dashed var(--line);border-radius:16px;padding:34px;text-align:center;color:var(--muted)}
+  @media (max-width:720px){ body{padding:24px 16px 50px} .charts{grid-template-columns:1fr} .bc-row{grid-template-columns:96px 1fr auto} }
+</style>
+</head>
+<body>
+  <h1>📊 Social Performance <span class="badge">demo</span></h1>
+  <p class="sub">Organic posts on LinkedIn and X.</p>
+
+  <div id="content"></div>
+  <p class="foot-note" id="note"></p>
+
+<script>
+(function(){
+  const params = new URLSearchParams(location.search);
+  const embedded = params.get("embed") !== null;
+  if(embedded) document.body.classList.add("embed");
+  function syncTheme(){
+    let dark = false;
+    try{ if(window.parent !== window){ dark = window.parent.document.documentElement.getAttribute("data-theme") !== "light"; } }catch(e){}
+    document.body.classList.toggle("dark", dark && embedded);
+  }
+  syncTheme();
+  try{ if(window.parent !== window){
+    new MutationObserver(syncTheme).observe(window.parent.document.documentElement, {attributes:true, attributeFilter:["data-theme"]});
+  }}catch(e){}
+})();
+
+const n = (v) => (v === null || v === undefined) ? "-" : v.toLocaleString("en-US");
+const esc = (s) => (s || "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const avg = (a) => a.length ? a.reduce((s,v)=>s+v,0)/a.length : 0;
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function weekRange(posts){
+  if(!posts.length) return "";
+  const d = new Date(posts[0].date + "T00:00:00");
+  const mon = new Date(d); mon.setDate(d.getDate() - ((d.getDay()+6)%7));
+  const fri = new Date(mon); fri.setDate(mon.getDate()+4);
+  return mon.getMonth()===fri.getMonth()
+    ? `${MONTHS[mon.getMonth()]} ${mon.getDate()}-${fri.getDate()}`
+    : `${MONTHS[mon.getMonth()]} ${mon.getDate()} - ${MONTHS[fri.getMonth()]} ${fri.getDate()}`;
+}
+function topPost(posts){
+  const ranked = posts.filter(p=>p.li||p.x)
+    .map(p=>({p, imp:(p.li?.impressions||0)+(p.x?.impressions||0)}))
+    .sort((a,b)=>b.imp-a.imp);
+  if(!ranked.length) return "";
+  const p = ranked[0].p, m = p.li || p.x;
+  const eng = (m.socialEng!=null) ? m.socialEng : ((m.likes||0)+(m.comments||0)+(m.reposts||0)+(m.saves||0));
+  const url = (p.li&&p.li.url) || (p.x&&p.x.url) || "#";
+  return `<div class="winner">
+    <div class="wtag">🏆 Top post this week ${p.format?`<span class="p">${esc(p.format)}</span>`:""}</div>
+    <div><span class="wname">${esc(p.name)}</span> <span class="wmeta">· ${esc(p.dateLabel)}</span></div>
+    <div class="wstats">
+      <span><b>${n((p.li?.impressions||0)+(p.x?.impressions||0))}</b>impressions (LI+X)</span>
+      ${(p.li&&p.li.followers!=null)?`<span><b>${n(p.li.followers)}</b>new followers</span>`:""}
+      <span><b>${n(eng)}</b>engagements</span>
+      <a class="wlink" href="${url}" target="_blank" rel="noopener">View post →</a>
+    </div>
+  </div>`;
+}
+function pair(li, x){
+  return `<td class="big">${n(li)}</td><td class="xcol">${n(x)}</td>`;
+}
+function table(posts){
+  const rows = posts.map(p=>{
+    const li=p.li||{}, x=p.x||{};
+    const links = `${p.li&&p.li.url?`<a class="li" href="${p.li.url}" target="_blank" rel="noopener" title="LinkedIn">in</a>`:""}${p.x&&p.x.url?`<a class="x" href="${p.x.url}" target="_blank" rel="noopener" title="X">𝕏</a>`:""}`;
+    return `<tr>
+      <td class="day">${esc(p.dateLabel)}</td>
+      <td class="col-post"><span class="pname">${esc(p.name)}</span><span class="plinks">${links}</span></td>
+      <td class="typecol">${p.format?`<span class="fmt">${esc(p.format)}</span>`:"-"}</td>
+      ${pair(li.impressions, x.impressions)}
+      ${pair(li.likes, x.likes)}
+      ${pair(li.comments, x.comments)}
+      ${pair(li.reposts, x.reposts)}
+      ${pair(li.saves, x.saves)}
+      <td class="fol">${n(li.followers)}</td>
+    </tr>`;
+  }).join("");
+  return `<h2 class="sec">📊 Week ${weekRange(posts)} <span>${posts.length} post${posts.length===1?"":"s"}</span></h2>
+    <div class="tbl-wrap"><table class="tbl">
+      <thead>
+        <tr class="grp">
+          <th rowspan="2">Day</th><th rowspan="2" class="col-post">Post</th><th rowspan="2">Type</th>
+          <th colspan="2">Impressions</th><th colspan="2">Likes</th><th colspan="2">Comments</th>
+          <th colspan="2">Reposts</th><th colspan="2">Saves</th><th rowspan="2">Followers</th>
+        </tr>
+        <tr class="sub"><th>𝗶𝗻</th><th>𝕏</th><th>𝗶𝗻</th><th>𝕏</th><th>𝗶𝗻</th><th>𝕏</th><th>𝗶𝗻</th><th>𝕏</th><th>𝗶𝗻</th><th>𝕏</th></tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+}
+function barChart(title, note, items, wide){
+  const max = Math.max(1, ...items.map(i=>i.value));
+  const rows = items.map(i=>`
+    <div class="bc-row">
+      <div class="bc-label" title="${esc(i.label)}">${esc(i.label)}</div>
+      <div class="bc-track"><div class="bc-fill" style="width:${Math.max(2,(i.value/max*100)).toFixed(1)}%"></div></div>
+      <div class="bc-val">${n(i.value)}${i.sub?`<span class="bc-sub">${esc(i.sub)}</span>`:""}</div>
+    </div>`).join("");
+  return `<div class="chart-card${wide?" wide":""}"><h3>${esc(title)}</h3><p class="chart-note">${esc(note)}</p>${rows}</div>`;
+}
+function charts(posts){
+  const withLi = posts.filter(p=>p.li);
+  const fmt={}; withLi.forEach(p=>{ if(p.format){(fmt[p.format]=fmt[p.format]||[]).push(p.li.impressions||0);} });
+  const typeItems = Object.entries(fmt).map(([f,a])=>({label:f, value:Math.round(avg(a)), sub:`${a.length} post${a.length>1?"s":""}`})).sort((x,y)=>y.value-x.value);
+  const liTot = withLi.reduce((s,p)=>s+(p.li.impressions||0),0);
+  const xTot = posts.filter(p=>p.x).reduce((s,p)=>s+(p.x.impressions||0),0);
+  const platItems = [{label:"LinkedIn", value:liTot}, {label:"X", value:xTot}];
+  const folItems = withLi.filter(p=>(p.li.followers||0)>0).map(p=>({label:p.name, value:p.li.followers})).sort((a,b)=>b.value-a.value).slice(0,8);
+
+  let out = `<div class="charts">`;
+  if(typeItems.length) out += barChart("Best post types", "Avg LinkedIn impressions per format - do more of the top ones.", typeItems, true);
+  out += barChart("LinkedIn vs X - total reach", "Where the eyeballs are.", platItems);
+  if(folItems.length) out += barChart("New followers by post", "Which posts actually grew the account.", folItems);
+  out += `</div>`;
+  return out;
+}
+function whatsWorking(posts){
+  const withLi = posts.filter(p=>p.li);
+  const totImp = withLi.reduce((s,p)=>s+(p.li.impressions||0),0);
+  const totFol = withLi.reduce((s,p)=>s+(p.li.followers||0),0);
+  const fmt={}; withLi.forEach(p=>{ if(p.format){(fmt[p.format]=fmt[p.format]||[]).push(p.li.impressions||0);} });
+  const fmtRank = Object.entries(fmt).map(([f,a])=>[f,avg(a),a.length]).sort((x,y)=>y[1]-x[1]);
+  const lp={}; withLi.forEach(p=>{ const k=p.li.linkPlacement; if(k){(lp[k]=lp[k]||[]).push(p.li.clicks||0);} });
+  const liReach = avg(withLi.map(p=>p.li.impressions||0));
+  const xReach = avg(posts.filter(p=>p.x).map(p=>p.x.impressions||0));
+  const topFol = [...withLi].sort((a,b)=>(b.li.followers||0)-(a.li.followers||0))[0];
+
+  const kpis = [
+    [posts.length, "Posts tracked"],
+    [totImp.toLocaleString("en-US"), "LinkedIn impressions"],
+    [totFol.toLocaleString("en-US"), "Followers gained"],
+    [fmtRank[0] ? fmtRank[0][0] : "-", "Top format"],
+  ];
+  const strip = `<div class="strip">${kpis.map(([nn,l])=>`<div class="kpi"><div class="n">${esc(String(nn))}</div><div class="l">${l}</div></div>`).join("")}</div>`;
+
+  const ins=[];
+  if(fmtRank.length>=2) ins.push([`🏆`, `<b>${esc(fmtRank[0][0])}</b> is the top format - <b>${Math.round(fmtRank[0][1]).toLocaleString("en-US")}</b> avg impressions <span class="dim">vs ${Math.round(fmtRank[fmtRank.length-1][1]).toLocaleString("en-US")} for ${esc(fmtRank[fmtRank.length-1][0])}.</span>`]);
+  if(lp["In post"]&&lp["In comment"]) ins.push([`🔗`, `Link <b>in the post</b> drove <b>${Math.round(avg(lp["In post"]))}</b> avg clicks <span class="dim">vs ${Math.round(avg(lp["In comment"]))} in a comment.</span>`]);
+  if(liReach&&xReach) ins.push([`📣`, `<b>LinkedIn</b> is the bigger engine - <b>${Math.round(liReach).toLocaleString("en-US")}</b> avg reach <span class="dim">vs ${Math.round(xReach).toLocaleString("en-US")} on X${liReach/xReach>1.5?` (~${(liReach/xReach).toFixed(0)}x)`:""}.</span>`]);
+  if(topFol&&(topFol.li.followers||0)>0) ins.push([`🌱`, `Most followers from one post: <b>${topFol.li.followers}</b> <span class="dim">- "${esc(topFol.name)}".</span>`]);
+  const insHtml = ins.length ? `<div class="insights">${ins.map(([ic,tx])=>`<div class="ins"><span class="ic">${ic}</span><span class="tx">${tx}</span></div>`).join("")}</div>` : "";
+
+  return `<h2 class="sec">🔥 What's working <span>real data to double down on</span></h2>${strip}${charts(posts)}${insHtml}`;
+}
+
+function render(posts){
+  const el = document.getElementById("content");
+  if(!posts || !posts.length){
+    el.innerHTML = `<div class="empty-state">No measured posts yet. Once the daily pull runs, they'll show up here.</div>`;
+    return;
+  }
+  el.innerHTML = topPost(posts) + table(posts) + whatsWorking(posts);
+}
+
+async function load(){
+  try{
+    const r = await fetch("data.json", {cache:"no-store"});
+    if(!r.ok) throw new Error("live data unavailable");
+    const j = await r.json();
+    render(j.posts);
+    if(j.generatedAt){
+      const t = new Date(j.generatedAt);
+      document.getElementById("note").textContent =
+        "Updated " + t.toLocaleString("en-US",{hour:"2-digit",minute:"2-digit",day:"numeric",month:"short"}) +
+        " · X shows public metrics only (followers + link clicks are LinkedIn-only).";
+    }
+  }catch(e){
+    document.getElementById("content").innerHTML =
+      `<div class="empty-state">Couldn't load live data (${esc(e.message)}). </div>`;
+  }
+}
+load();
+document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) load(); });
+</script>
+</body>
+</html>

@@ -14,7 +14,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="daily-deck.css">
   <link rel="stylesheet" href="mock/demo.css">
 </head>
 <body>
@@ -29,32 +28,70 @@
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 7l6-4.5L14 7v6.5a.5.5 0 0 1-.5.5H10V10H6v4H2.5a.5.5 0 0 1-.5-.5V7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
         Home
       </button>
+      <button class="nav-item" data-tab="big3">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="0.8" fill="currentColor"/></svg>
+        Big 3
+      </button>
 
       <div class="nav-section">Revenue</div>
       <button class="nav-item" data-tab="pipeline">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 3h12M3 3v3l3 3v4l4 1V9l3-3V3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Sponsorship Pipeline
       </button>
+      <button class="nav-item" data-tab="bookings">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 12l4-5 3 3 5-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 4h3v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Bookings Forecast
+      </button>
+      <button class="nav-item" data-tab="revmodel">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M3 8h10M3 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="6" cy="4" r="1.6" fill="currentColor"/><circle cx="10" cy="8" r="1.6" fill="currentColor"/><circle cx="5" cy="12" r="1.6" fill="currentColor"/></svg>
+        Revenue Calculator
+      </button>
+      <button class="nav-item" data-tab="funnel">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 3h12l-4 5v5l-4-2V8L2 3z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        StrategyHub Funnel
+      </button>
+
       <div class="nav-section">Delivery</div>
       <button class="nav-item" data-tab="contentcal">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M2 6h12M5 2v2M11 2v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="5.5" cy="9.3" r="1.1" fill="currentColor"/><circle cx="8" cy="9.3" r="1.1" fill="currentColor"/><circle cx="10.5" cy="9.3" r="1.1" fill="currentColor"/></svg>
         Content Calendar
       </button>
+      <button class="nav-item" data-tab="calendar">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M2 6h12M5 2v2M11 2v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Deliverables Calendar
+      </button>
       <button class="nav-item" data-tab="fulfilment">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 5l6-3 6 3-6 3-6-3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M2 5v6l6 3 6-3V5M8 8v6" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
         Campaign Tracker
       </button>
+      <button class="nav-item" data-tab="watchdog">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="4" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 4V2M5.5 7v1.5M10.5 7v1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M2 9h1M13 9h1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Automation Watchdog
+        <span class="draft-count-badge" id="watchdogBlockedBadge"></span>
+      </button>
+
       <div class="nav-section">Dailies</div>
       <button class="nav-item" data-tab="dailies" title="What the daily run is feeding us, and the button that opens the swipe deck">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="4.5" y="2" width="9" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 4.5v7.5a2 2 0 0 0 2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         Daily Triage
         <span class="draft-count-badge" id="ddLaunchCount"></span>
       </button>
+
       <div class="nav-section">Audience</div>
       <button class="nav-item" data-tab="audience">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.2" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 13c0-2 1.6-3.3 3.5-3.3S9.5 11 9.5 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10.5 4.2A2 2 0 0 1 11 8m1 4.8c0-1.4-.5-2.5-1.5-3.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         Audience Growth
       </button>
+      <button class="nav-item" data-tab="social">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 11.5l3.4-3.4 2.2 2.2L14 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="4.5" r="1.3" fill="currentColor"/></svg>
+        Social Performance
+      </button>
+      <div class="sidebar-divider"></div>
+      <button class="nav-item" data-tab="shipping">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 13V9M8 13V4M13 13V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M2 13h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Shipping Leaderboard
+      </button>
+
       <div class="nav-section">Skills &amp; System</div>
       <button class="nav-item" data-tab="skills">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -63,6 +100,14 @@
       <button class="nav-item" data-tab="skillpeople">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.2" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 13c0-2 1.6-3.3 3.5-3.3S9.5 11 9.5 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M11 5.5h3M11 8.5h3M12 11.5h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         Skills by Person
+      </button>
+      <button class="nav-item" data-tab="repo">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 3.5h4l1.5 1.5H14v7.5a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5V3.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        Repo File Tree
+      </button>
+      <button class="nav-item" data-tab="suggestions">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 0 0-2.5 7.1V11h5V9.1A4 4 0 0 0 8 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M6 13.5h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Skill Suggestions
       </button>
     </nav>
 
@@ -86,6 +131,15 @@
         <h2>Home</h2>
       </div>
       <div class="home-grid" id="homeGrid"></div>
+    </section>
+    <section class="tab-panel" id="panel-big3">
+      <div class="panel-header">
+        <h2>Big 3</h2>
+        <p class="section-hint">Each person's 3 focused tasks this week, straight from the team task board. Working on the business, not campaign delivery. The rule: 3 each, every one pointed at a goal, nothing else gets the week.</p>
+        <p class="section-hint" id="big3Sub">Loading&hellip;</p>
+      </div>
+      <div class="big3-toolbar"><button class="drafts-refresh-btn" id="big3Refresh" title="Re-read the task board"><span class="refresh-label">Refresh</span></button></div>
+      <div class="big3-grid" id="big3Grid"></div>
     </section>
     <section class="tab-panel" id="panel-pipeline">
       <div class="panel-header">
@@ -116,6 +170,41 @@
         <p class="section-hint">Every open deal, flowing left to right toward the win. Click a card to open it in the CRM (links are disabled in the demo).</p>
       </div>
       <div class="pipe-board" id="pipeBoard"></div>
+    </section>
+    <section class="tab-panel" id="panel-bookings">
+      <div class="panel-header">
+        <h2>Bookings Forecast <span class="count" id="bookCount"></span></h2>
+        <p class="section-hint">Money already <b>booked and confirmed</b> - signed work with dates in the diary. Not proposals, not pipeline, not leads. Read from the bookings and deliverables databases, not the CRM, so nothing here is a forecast of what might close.</p>
+        <p class="section-hint" id="bookSub">Loading&hellip;</p>
+      </div>
+      <div class="pipe-cards" id="bookCards"></div>
+      <div class="pipe-charts" id="bookCharts"></div>
+    </section>
+    <section class="tab-panel" id="panel-revmodel">
+      <div class="panel-header">
+        <h2>Revenue Calculator</h2>
+        <p class="section-hint">What a month of sponsorship revenue looks like at the current rate card, and what the Daily adds. Every starting value is measured from the last 3 months; move the sliders to test scenarios.</p>
+      </div>
+      <div class="demo-veil-wrap"><div class="demo-veil-badge"><span><svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="currentColor" stroke-width="1.5"/></svg>Hidden in the public demo</span></div><div class="demo-veil" aria-hidden="true" inert>
+      <div id="rmRoot"><p class="section-hint">Loading&hellip;</p></div>
+      </div></div>
+    </section>
+    <section class="tab-panel" id="panel-funnel" data-spoil="all">
+      <div class="panel-header">
+        <h2>StrategyHub Funnel</h2>
+        <p class="section-hint">How visitors become StrategyHub customers, from landing page through to purchase, with live revenue from Stripe.</p>
+      </div>
+      <div class="funnel-toolbar">
+        <div class="funnel-period-pills" id="funnelPeriodPills"></div>
+        <div class="funnel-toolbar-right">
+          <span class="funnel-meta" id="funnelMeta"></span>
+          <button class="drafts-refresh-btn" id="funnelRefreshBtn" onclick="refreshFunnel()" title="Re-fetch from beehiiv, web analytics and Stripe">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M14 8A6 6 0 1 1 8 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M8 0l3 2-3 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="refresh-label">Refresh</span>
+          </button>
+        </div>
+      </div>
+      <div id="funnelContainer"><div class="funnel-loading">Loading funnel data&hellip;</div></div>
     </section>
     <section class="tab-panel" id="panel-contentcal">
       <div class="panel-header">
@@ -157,6 +246,15 @@
         <div class="idea-modal-body" id="ccalModalBody"></div>
       </div>
     </section>
+    <section class="tab-panel" id="panel-calendar">
+      <div class="panel-header">
+        <h2>Deliverables Calendar <span class="count" id="calCount"></span></h2>
+        <p class="section-hint" id="calSub">Loading&hellip;</p>
+      </div>
+      <div class="cal-cards" id="calCards"></div>
+      <div class="cal-legend" id="calLegend"></div>
+      <div class="cal-agenda" id="calAgenda"></div>
+    </section>
     <section class="tab-panel" id="panel-fulfilment">
       <div class="panel-header">
         <h2>Campaign Tracker</h2>
@@ -173,28 +271,32 @@
       </div>
       <div id="pulseContainer"><div class="pipe-empty">Loading campaigns&hellip;</div></div>
 </section>
+    <section class="tab-panel" id="panel-watchdog">
+      <div class="panel-header">
+        <h2>Automation Watchdog <span class="count" id="watchdogCount"></span></h2>
+        <p class="section-hint">Last run: <span id="watchdogLastRun">never</span></p>
+      </div>
+      <div class="watchdog-about">
+        <p><b>What it is for.</b> As more of the newsletter runs on automations, the risk stops being "did someone forget" and becomes "did the automation quietly not run". The watchdog is the second pair of eyes on that, so a job that silently failed gets noticed the next morning rather than the week a sponsor asks where their report is.</p>
+        <p><b>What it does.</b> Once a day it checks what should have happened across beehiiv, the CRM, Notion and Slack against what the automations actually did, in both directions: what should have fired and did not, and what fired that should not have.</p>
+        <p><b>What it never does.</b> It never does the work itself and never writes to anything a sponsor can see. It only reports. Every run is logged below.</p>
+      </div>
+      <div class="drafts-toolbar">
+        <div class="drafts-filters" id="watchdogFilters"></div>
+      </div>
+      <div id="watchdogContainer"></div>
+    </section>
     <section class="tab-panel" id="panel-dailies">
       <div class="panel-header">
         <h2>Daily Triage <span class="count" id="dtCount"></span></h2>
         <p class="section-hint" id="dtSub">Loading&hellip;</p>
-      </div>
-      <div class="dt-hero">
-        <button type="button" class="dt-launch" id="dtLaunch">
-          <svg width="20" height="20" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="4.5" y="2" width="9" height="12" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M2.5 4.5v7.5a2 2 0 0 0 2 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-          Open the triage deck
-          <span class="dt-launch-n" id="dtLaunchN"></span>
-        </button>
-        <div class="dt-hero-text">
-          <p class="dt-queue" id="dtQueue">Checking the queue&hellip;</p>
-          <p class="dt-keys">Drag right to migrate, left to archive, up for later <kbd>Z</kbd> undo <kbd>Esc</kbd> back here</p>
-        </div>
       </div>
       <div class="dt-toolbar">
         <div class="dt-period" id="dtPeriod">
           <button class="period-pill active" data-p="all">Lifetime</button>
           <button class="period-pill" data-p="30">Last 30 days</button>
         </div>
-        <button class="drafts-refresh-btn" id="dtRefresh" title="Re-read every Daily row"><span class="refresh-label">Refresh</span></button>
+        <button class="drafts-refresh-btn" id="dtRefresh" title="Re-read every topic"><span class="refresh-label">Refresh</span></button>
       </div>
       <div class="pipe-cards" id="dtKpis"></div>
       <div class="dt-grid">
@@ -203,7 +305,7 @@
         <div class="sub-block dt-topics" id="dtTopics"></div>
       </div>
     </section>
-    <section class="tab-panel" id="panel-audience">
+    <section class="tab-panel" id="panel-audience" data-spoil="all">
       <div class="panel-header">
         <h2>Audience Growth <span class="count" id="subCount"></span></h2>
         <p class="section-hint" id="subSub">Loading&hellip;</p>
@@ -221,16 +323,35 @@
           <th>Sent</th><th>Edition</th><th>Recipients</th><th>Open rate</th><th>Click rate</th></tr></thead><tbody></tbody></table>
       </div>
     </section>
+    <section class="tab-panel" id="panel-social">
+      <div class="panel-header">
+        <h2>Social Performance</h2>
+        <p class="section-hint">The founder's organic posts on LinkedIn and X: reach, engagement and what is working.</p>
+      </div>
+      <div class="demo-veil-wrap"><div class="demo-veil-badge"><span><svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="currentColor" stroke-width="1.5"/></svg>Hidden in the public demo</span></div><div class="demo-veil" aria-hidden="true" inert>
+      <iframe id="socialFrame" title="Social Performance" scrolling="no" style="width:100%;border:0;display:block;background:transparent;min-height:420px"></iframe>
+      </div></div>
+    </section>
+    <section class="tab-panel" id="panel-shipping" data-spoil="none">
+      <div class="panel-header">
+        <h2>Shipping Leaderboard <span class="count" id="shipCount"></span></h2>
+        <p class="section-hint" id="shipSub">Who is shipping changes to the team repo, and how much. Every commit that reaches main counts, whoever or whatever wrote it.</p>
+      </div>
+      <div class="pipe-cards" id="shipCards"></div>
+      <div class="pipe-charts" id="shipCharts"></div>
+    </section>
     <section class="tab-panel" id="panel-skills">
       <div class="panel-header">
         <h2>Skills</h2>
         <p class="section-hint">Every Claude Code skill the team runs, so you can see what Claude can already do before asking for something new.</p>
       </div>
+      <div class="demo-veil-wrap"><div class="demo-veil-badge"><span><svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="currentColor" stroke-width="1.5"/></svg>Hidden in the public demo</span></div><div class="demo-veil" aria-hidden="true" inert>
       <div class="skills-toolbar">
         <input type="text" class="skills-search" id="skillsSearch" placeholder="Search by task, e.g. move an ad to next week…">
         <span class="skills-count" id="skillCount"></span>
       </div>
       <div id="skillsView"></div>
+      </div></div>
     </section>
     <section class="tab-panel" id="panel-skillpeople">
       <div class="panel-header">
@@ -238,6 +359,24 @@
         <p class="section-hint" id="spSub">Who built each skill and who keeps working on it, from git history.</p>
       </div>
       <div id="spContainer"><p class="section-hint">Loading&hellip;</p></div>
+    </section>
+    <section class="tab-panel" id="panel-repo">
+      <div class="panel-header">
+        <h2>Repo File Tree</h2>
+        <p class="section-hint">Context and skill files by folder. Staleness is days since last edit.</p>
+      </div>
+      <div class="demo-veil-wrap"><div class="demo-veil-badge"><span><svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="currentColor" stroke-width="1.5"/></svg>Hidden in the public demo</span></div><div class="demo-veil hard" aria-hidden="true" inert>
+      <div id="contextContainer"></div>
+      </div></div>
+    </section>
+    <section class="tab-panel" id="panel-suggestions">
+      <div class="panel-header">
+        <h2>Skill Suggestions</h2>
+        <p class="section-hint">Claude updates <code>skill-suggestions.md</code> when it notices patterns that could become new skills.</p>
+      </div>
+      <div class="demo-veil-wrap"><div class="demo-veil-badge"><span><svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="currentColor" stroke-width="1.5"/></svg>Hidden in the public demo</span></div><div class="demo-veil" aria-hidden="true" inert>
+      <div id="suggestionsContainer"></div>
+      </div></div>
     </section>
   </main>
 
@@ -259,7 +398,8 @@
   <script src="mock/mock-api.js"></script>
   <script src="mock/spoiler.js"></script>
   <script src="app.js"></script>
-  <script src="daily-deck.js"></script>
   <script src="daily-triage.js"></script>
+  <script src="big3.js"></script>
+  <script src="revenue-calculator.js"></script>
 </body>
 </html>

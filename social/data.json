@@ -1,0 +1,187 @@
+{
+ "generatedAt": "2026-10-15T10:38:35.033Z",
+ "posts": [
+  {
+   "name": "A pricing page teardown",
+   "date": "2026-10-14",
+   "dateLabel": "Wed Oct 14",
+   "format": "Carousel",
+   "type": "Organic",
+   "li": {
+    "impressions": 37932,
+    "likes": 227,
+    "comments": 9,
+    "reposts": 17,
+    "saves": 54,
+    "followers": 118,
+    "clicks": 34,
+    "linkPlacement": "In post",
+    "url": "https://demo.invalid/li/post-0"
+   },
+   "x": {
+    "impressions": 12818,
+    "likes": 61,
+    "comments": 19,
+    "reposts": 23,
+    "saves": 35,
+    "url": "https://demo.invalid/x/post-0"
+   }
+  },
+  {
+   "name": "Why free tiers work",
+   "date": "2026-10-13",
+   "dateLabel": "Tue Oct 13",
+   "format": "Text",
+   "type": "Organic",
+   "li": {
+    "impressions": 30104,
+    "likes": 386,
+    "comments": 23,
+    "reposts": 25,
+    "saves": 25,
+    "followers": 13,
+    "clicks": 126,
+    "linkPlacement": "In comment",
+    "url": "https://demo.invalid/li/post-1"
+   },
+   "x": {
+    "impressions": 13751,
+    "likes": 85,
+    "comments": 13,
+    "reposts": 6,
+    "saves": 1,
+    "url": "https://demo.invalid/x/post-1"
+   }
+  },
+  {
+   "name": "The 3-sided marketplace, drawn",
+   "date": "2026-10-12",
+   "dateLabel": "Mon Oct 12",
+   "format": "Image",
+   "type": "Organic",
+   "li": {
+    "impressions": 36607,
+    "likes": 41,
+    "comments": 43,
+    "reposts": 29,
+    "saves": 73,
+    "followers": 114,
+    "clicks": 89,
+    "linkPlacement": "In post",
+    "url": "https://demo.invalid/li/post-2"
+   },
+   "x": {
+    "impressions": 11050,
+    "likes": 104,
+    "comments": 17,
+    "reposts": 11,
+    "saves": 8,
+    "url": "https://demo.invalid/x/post-2"
+   }
+  },
+  {
+   "name": "Retention curves, read properly",
+   "date": "2026-10-11",
+   "dateLabel": "Sun Oct 11",
+   "format": "Carousel",
+   "type": "Organic",
+   "li": {
+    "impressions": 17956,
+    "likes": 111,
+    "comments": 16,
+    "reposts": 17,
+    "saves": 42,
+    "followers": 111,
+    "clicks": 49,
+    "linkPlacement": "In comment",
+    "url": "https://demo.invalid/li/post-3"
+   },
+   "x": {
+    "impressions": 12711,
+    "likes": 104,
+    "comments": 10,
+    "reposts": 13,
+    "saves": 32,
+    "url": "https://demo.invalid/x/post-3"
+   }
+  },
+  {
+   "name": "What a moat is not",
+   "date": "2026-10-10",
+   "dateLabel": "Sat Oct 10",
+   "format": "Text",
+   "type": "Organic",
+   "li": {
+    "impressions": 25962,
+    "likes": 123,
+    "comments": 51,
+    "reposts": 23,
+    "saves": 45,
+    "followers": 120,
+    "clicks": 90,
+    "linkPlacement": "In post",
+    "url": "https://demo.invalid/li/post-4"
+   },
+   "x": {
+    "impressions": 2135,
+    "likes": 137,
+    "comments": 23,
+    "reposts": 23,
+    "saves": 25,
+    "url": "https://demo.invalid/x/post-4"
+   }
+  },
+  {
+   "name": "One chart on ad spend",
+   "date": "2026-10-09",
+   "dateLabel": "Fri Oct 9",
+   "format": "Image",
+   "type": "Organic",
+   "li": {
+    "impressions": 29498,
+    "likes": 204,
+    "comments": 21,
+    "reposts": 11,
+    "saves": 6,
+    "followers": 123,
+    "clicks": 124,
+    "linkPlacement": "In comment",
+    "url": "https://demo.invalid/li/post-5"
+   },
+   "x": {
+    "impressions": 4408,
+    "likes": 69,
+    "comments": 12,
+    "reposts": 5,
+    "saves": 18,
+    "url": "https://demo.invalid/x/post-5"
+   }
+  },
+  {
+   "name": "The referral loop, explained",
+   "date": "2026-10-08",
+   "dateLabel": "Thu Oct 8",
+   "format": "Video",
+   "type": "Organic",
+   "li": {
+    "impressions": 25720,
+    "likes": 227,
+    "comments": 19,
+    "reposts": 4,
+    "saves": 31,
+    "followers": 127,
+    "clicks": 73,
+    "linkPlacement": "In post",
+    "url": "https://demo.invalid/li/post-6"
+   },
+   "x": {
+    "impressions": 7515,
+    "likes": 23,
+    "comments": 15,
+    "reposts": 1,
+    "saves": 19,
+    "url": "https://demo.invalid/x/post-6"
+   }
+  }
+ ]
+}

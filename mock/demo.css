@@ -1,18 +1,22 @@
-:root { --demo-bar: 0px; }
-.demo-banner {
-  position: fixed; top: 0; left: 0; right: 0; height: var(--demo-bar); z-index: 1000;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  font: 600 12.5px/1 'Manrope', -apple-system, sans-serif; letter-spacing: .02em;
-  color: #1A1A1F; background: repeating-linear-gradient(135deg, #FBBF24 0 14px, #F5B014 14px 28px);
-  pointer-events: none;
-}
-.demo-banner::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #1A1A1F; }
-.sidebar { top: var(--demo-bar); }
-.main-content { padding-top: calc(32px + var(--demo-bar)); }
-.drawer { top: var(--demo-bar); }
-.dd-overlay { top: var(--demo-bar); }
-
 .blur-num { filter: blur(5px); user-select: none; display: inline-block; }
+
+/* Text hidden in the demo: skill names and descriptions, edition names. */
+.blur-txt { filter: blur(4.5px); user-select: none; }
+span.blur-txt, a.blur-txt { display: inline-block; }
+.pipe-v .blur-txt { filter: blur(8px); }
+svg .blur-txt { filter: url(#sbDemoBlur); }
+#skillDrawer .drawer-header h3, #skillDrawer .drawer-workflow-tags, #skillDrawer .drawer-body { filter: blur(5px); user-select: none; }
+
+/* Tabs hidden in the demo: everything under the panel header is blurred and inert. */
+.demo-veil-wrap { position: relative; }
+.demo-veil { filter: blur(7px) saturate(.85); pointer-events: none; user-select: none; }
+.demo-veil.hard { filter: blur(16px) saturate(.5) opacity(.75); }
+.demo-veil-badge { position: sticky; top: 42vh; z-index: 5; height: 0; display: flex; justify-content: center; overflow: visible; }
+.demo-veil-badge span {
+  display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 999px;
+  background: var(--bg-card, #232228); color: var(--text, #FFFAF3); border: 1px solid var(--border, #33333f);
+  font: 600 13px/1 'Manrope', -apple-system, sans-serif; box-shadow: 0 10px 30px rgba(0, 0, 0, .28);
+}
 
 .demo-toast {
   position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 20px); z-index: 1001;
