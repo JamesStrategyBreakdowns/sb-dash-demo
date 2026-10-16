@@ -1282,7 +1282,7 @@ const SKILL_SYNONYMS = {
   congrats: [ 'keep-warm' ],
   onboard: [ 'onboarding', 'onboard-sponsor' ],
   migrate: [ 'migrate', 'beehiiv' ],
-  daily: [ 'daily-newsletter' ]
+  daily: [ 'daily-pulse' ]
 };
 
 const skillStem = w => w.replace(/(ings?|ed|es|s)$/, '');

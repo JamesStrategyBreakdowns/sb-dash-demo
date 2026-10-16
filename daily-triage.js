@@ -4,7 +4,6 @@
     loading: false,
     error: null,
     period: 'all',
-    queue: null,
     wired: false
   };
   const $ = id => document.getElementById(id);
@@ -82,25 +81,6 @@
     return `<span class="dt-bar" style="width:${Math.max(w, 2)}%">${segs}</span>`;
   }
   const legend = () => `<div class="dt-legend">${OUTCOMES.map((o => `<span><i class="dt-sw dt-${o.key}"></i>${o.label}</span>`)).join('')}</div>`;
-  function renderQueue() {
-    const q = T.queue;
-    const n = $('dtLaunchN');
-    const line = $('dtQueue');
-    if (!n || !line) return;
-    if (!q || !q.loaded) {
-      n.textContent = '';
-      line.innerHTML = q?.error ? `<span class="dt-warn">Couldn't load the queue: ${esc(q.error)}</span>` : 'Checking the queue in Notion&hellip;';
-      return;
-    }
-    n.textContent = q.count;
-    if (!q.count) {
-      line.innerHTML = '<b>Stack is clear.</b> Nothing enriched is waiting for a call.';
-      return;
-    }
-    const parts = Object.entries(q.byStatus).sort(((a, b) => b[1] - a[1])).map((([s, c]) => `${esc(s)} <b>${c}</b>`));
-    const age = q.oldest ? Math.floor((Date.now() - Date.parse(q.oldest)) / DAY) : null;
-    line.innerHTML = `<b>${plural(q.count, 'Daily', 'Dailies')} waiting for a call</b><span class="dt-dot">·</span>${parts.join('<span class="dt-dot">·</span>')}${age != null ? `<span class="dt-dot">·</span>oldest made ${age === 0 ? 'today' : plural(age, 'day') + ' ago'}` : ''}`;
-  }
   function renderKpis(rows, all) {
     const approved = rows.filter((r => r.outcome === 'approved')).length;
     const archived = rows.filter((r => r.outcome === 'archived')).length;

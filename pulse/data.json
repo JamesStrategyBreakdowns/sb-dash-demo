@@ -6,51 +6,105 @@
    "items": [
     {
      "t": "Ad 1",
-     "date": "Oct 4",
+     "date": "Oct 7",
      "s": "done",
      "url": "https://demo.invalid/deliverable/globex-3"
     },
     {
      "t": "LinkedIn",
-     "date": "Oct 5",
+     "date": "Oct 8",
      "s": "done",
      "url": "https://demo.invalid/deliverable/globex-3"
     },
     {
      "t": "X",
-     "date": "Oct 6",
+     "date": "Oct 9",
      "s": "done",
      "url": "https://demo.invalid/deliverable/globex-3"
     },
     {
      "t": "Ad 2",
-     "date": "Oct 11",
+     "date": "Oct 14",
      "s": "done",
      "url": "https://demo.invalid/deliverable/globex-3"
     },
     {
      "t": "Ad 3",
-     "date": "Oct 18",
+     "date": "Oct 21",
      "s": "active",
      "url": "https://demo.invalid/deliverable/globex-3"
     },
     {
      "t": "Ad 4",
-     "date": "Oct 25",
-     "s": "active",
-     "url": "https://demo.invalid/deliverable/globex-3"
-    },
-    {
-     "t": "Retarget",
      "date": "Oct 28",
      "s": "active",
      "url": "https://demo.invalid/deliverable/globex-3"
     },
     {
-     "t": "Domain Ins.",
-     "date": "Nov 4",
+     "t": "Retarget",
+     "date": "Oct 31",
      "s": "active",
      "url": "https://demo.invalid/deliverable/globex-3"
+    },
+    {
+     "t": "Domain Ins.",
+     "date": "Nov 7",
+     "s": "todo",
+     "url": "https://demo.invalid/deliverable/globex-3"
+    }
+   ]
+  },
+  {
+   "name": "Hooli",
+   "sponsor": "Phase 3",
+   "items": [
+    {
+     "t": "Ad 1",
+     "date": "Sep 16",
+     "s": "done",
+     "url": "https://demo.invalid/deliverable/hooli-3"
+    },
+    {
+     "t": "LinkedIn",
+     "date": "Sep 17",
+     "s": "done",
+     "url": "https://demo.invalid/deliverable/hooli-3"
+    },
+    {
+     "t": "X",
+     "date": "Sep 18",
+     "s": "done",
+     "url": "https://demo.invalid/deliverable/hooli-3"
+    },
+    {
+     "t": "Ad 2",
+     "date": "Sep 23",
+     "s": "done",
+     "url": "https://demo.invalid/deliverable/hooli-3"
+    },
+    {
+     "t": "Ad 3",
+     "date": "Sep 30",
+     "s": "done",
+     "url": "https://demo.invalid/deliverable/hooli-3"
+    },
+    {
+     "t": "Ad 4",
+     "date": "Oct 7",
+     "s": "done",
+     "url": "https://demo.invalid/deliverable/hooli-3"
+    },
+    {
+     "t": "Retarget",
+     "date": "Oct 10",
+     "s": "done",
+     "url": "https://demo.invalid/deliverable/hooli-3"
+    },
+    {
+     "t": "Domain Ins.",
+     "date": "Oct 17",
+     "s": "active",
+     "url": "https://demo.invalid/deliverable/hooli-3"
     }
    ]
   },
@@ -60,43 +114,43 @@
    "items": [
     {
      "t": "Ad 1",
-     "date": "Oct 28",
+     "date": "Oct 25",
      "s": "active",
      "url": "https://demo.invalid/deliverable/prestige-worldwide-3"
     },
     {
      "t": "LinkedIn",
-     "date": "Oct 29",
+     "date": "Oct 26",
      "s": "active",
      "url": "https://demo.invalid/deliverable/prestige-worldwide-3"
     },
     {
      "t": "X",
-     "date": "Oct 30",
+     "date": "Oct 27",
      "s": "active",
      "url": "https://demo.invalid/deliverable/prestige-worldwide-3"
     },
     {
      "t": "Ad 2",
-     "date": "Nov 4",
+     "date": "Nov 1",
      "s": "active",
      "url": "https://demo.invalid/deliverable/prestige-worldwide-3"
     },
     {
      "t": "Ad 3",
-     "date": "Nov 11",
+     "date": "Nov 8",
      "s": "todo",
      "url": "https://demo.invalid/deliverable/prestige-worldwide-3"
     },
     {
      "t": "Retarget",
-     "date": "Nov 14",
+     "date": "Nov 11",
      "s": "todo",
      "url": "https://demo.invalid/deliverable/prestige-worldwide-3"
     },
     {
      "t": "Domain Ins.",
-     "date": "Nov 21",
+     "date": "Nov 18",
      "s": "todo",
      "url": "https://demo.invalid/deliverable/prestige-worldwide-3"
     }
@@ -108,43 +162,43 @@
    "items": [
     {
      "t": "Ad 1",
-     "date": "Sep 23",
+     "date": "Sep 27",
      "s": "done",
      "url": "https://demo.invalid/deliverable/sterling-cooper-3"
     },
     {
      "t": "LinkedIn",
-     "date": "Sep 24",
+     "date": "Sep 28",
      "s": "done",
      "url": "https://demo.invalid/deliverable/sterling-cooper-3"
     },
     {
      "t": "X",
-     "date": "Sep 25",
+     "date": "Sep 29",
      "s": "done",
      "url": "https://demo.invalid/deliverable/sterling-cooper-3"
     },
     {
      "t": "Ad 2",
-     "date": "Sep 30",
+     "date": "Oct 4",
      "s": "done",
      "url": "https://demo.invalid/deliverable/sterling-cooper-3"
     },
     {
      "t": "Ad 3",
-     "date": "Oct 7",
+     "date": "Oct 11",
      "s": "done",
      "url": "https://demo.invalid/deliverable/sterling-cooper-3"
     },
     {
      "t": "Retarget",
-     "date": "Oct 10",
+     "date": "Oct 14",
      "s": "done",
      "url": "https://demo.invalid/deliverable/sterling-cooper-3"
     },
     {
      "t": "Domain Ins.",
-     "date": "Oct 17",
+     "date": "Oct 21",
      "s": "active",
      "url": "https://demo.invalid/deliverable/sterling-cooper-3"
     }
@@ -229,7 +283,7 @@
     {
      "t": "X",
      "date": "Nov 6",
-     "s": "todo",
+     "s": "active",
      "url": "https://demo.invalid/deliverable/wonka-industries-3"
     },
     {
@@ -265,5 +319,5 @@
    ]
   }
  ],
- "generatedAt": "2026-10-15T10:38:35.013Z"
+ "generatedAt": "2026-10-16T02:03:01.820Z"
 }
